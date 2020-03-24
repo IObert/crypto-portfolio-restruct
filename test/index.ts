@@ -37,4 +37,5 @@ myManager.setGoalState([{
   name: "Monero",
   ratio: 0.34
 }])
+
 console.log(myManager.getOrders());

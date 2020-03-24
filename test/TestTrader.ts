@@ -1,6 +1,6 @@
 
 import { PortfolioManager } from '../src/PortfolioManager';
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 import 'mocha';
 
 describe('Portfolio Manager with unit prices', () => {
@@ -67,7 +67,7 @@ describe('Portfolio Manager with unit prices', () => {
       ratio: 0.2
     }]);
 
-    expect(myManager.getOrders()).to.have.members([{
+    assert.sameDeepMembers(myManager.getOrders(), [{
       tradingpair: "BNBUSDT",
       side: "BUY",
       quantity: 1
@@ -149,24 +149,23 @@ describe('Portfolio Manager with unit prices', () => {
       ratio: 0.2
     }]);
 
-    expect(myManager.getOrders()).to.have.members([
-      {
-        tradingpair: "BTCUSDT",
-        side: "SELL",
-        quantity: 3
-      }, {
-        tradingpair: "ETHUSDT",
-        side: "BUY",
-        quantity: 1
-      }, {
-        tradingpair: "TRXUSDT",
-        side: "BUY",
-        quantity: 1
-      }, {
-        tradingpair: "XRMUSDT",
-        side: "BUY",
-        quantity: 1
-      }
+    assert.sameDeepMembers(myManager.getOrders(), [{
+      tradingpair: "BTCUSDT",
+      side: "SELL",
+      quantity: 3
+    }, {
+      tradingpair: "ETHUSDT",
+      side: "BUY",
+      quantity: 1
+    }, {
+      tradingpair: "TRXUSDT",
+      side: "BUY",
+      quantity: 1
+    }, {
+      tradingpair: "XRMUSDT",
+      side: "BUY",
+      quantity: 1
+    }
     ]);
   });
 
@@ -217,7 +216,7 @@ describe('Portfolio Manager with simplified prices', () => {
       ratio: 0.25
     }]);
 
-    expect(myManager.getOrders()).to.have.members([{
+    assert.sameDeepMembers(myManager.getOrders(), [{
       tradingpair: "BTCUSDT",
       side: "SELL",
       quantity: 1
@@ -273,7 +272,7 @@ describe('Portfolio Manager with simplified prices', () => {
       ratio: 0.34
     }]);
 
-    expect(myManager.getOrders()).to.have.members([{
+    assert.sameDeepMembers(myManager.getOrders(), [{
       tradingpair: "BTCUSDT",
       side: "SELL",
       quantity: 0.9825000003575
@@ -329,7 +328,7 @@ describe('Portfolio Manager with simplified prices', () => {
       ratio: 0.34
     }]);
 
-    expect(myManager.getOrders()).to.have.members([{
+    assert.sameDeepMembers(myManager.getOrders(), [{
       tradingpair: "USDTBTC",
       side: "BUY",
       quantity: 5895.003216001286
@@ -342,6 +341,7 @@ describe('Portfolio Manager with simplified prices', () => {
       side: "BUY",
       quantity: 157.25004080001634
     }]);
+
   });
 
 });

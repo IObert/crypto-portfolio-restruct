@@ -2,14 +2,14 @@ import BinanceClient, { Binance, AssetBalance } from "binance-api-node";
 
 
 interface Order {
-    tradingpair: string; //TODO Tradingpair;
+    tradingpair: string; 
     side: string;
     quantity: number;
 }
 
 interface TargetAsset {
-    symbol: string; //TODO also use enum?
-    name?: string; //TODO also use enum?
+    asset: string; 
+    name?: string; 
     ratio: number;
     delta?: number;
 }
@@ -18,7 +18,7 @@ interface Configuration {
     binance_key?: string;
     binance_secret?: string;
     max_price_diff?: string;
-    base_currency?: string; //TODO AssetSymbol;
+    base_currency?: string; 
     prices?: any;
     balances?: AssetBalance[];
     test?: boolean;
@@ -89,12 +89,12 @@ export class PortfolioManager {
 
             const targetAmountInBaseCurrency = targetBalanceItem.ratio * sumOfCurrentAssets;
 
-            const owning = this.balances.find((currentBalanceItem) => currentBalanceItem.asset === targetBalanceItem.symbol);
+            const owning = this.balances.find((currentBalanceItem) => currentBalanceItem.asset === targetBalanceItem.asset);
             if (!owning) {
-                throw new Error(`Asset missing in current balance: ${targetBalanceItem.symbol}`);
+                throw new Error(`Asset missing in current balance: ${targetBalanceItem.asset}`);
             }
 
-            const currentAmountInBaseCurrency = +owning.free * this.getConvertionRate(targetBalanceItem.symbol, "USDT");
+            const currentAmountInBaseCurrency = +owning.free * this.getConvertionRate(targetBalanceItem.asset, "USDT");
 
             targetBalanceItem.delta = targetAmountInBaseCurrency - currentAmountInBaseCurrency;
         });
@@ -105,9 +105,9 @@ export class PortfolioManager {
 
         const orders = this.targetBalances.map(targetBalanceItem => {
 
-            const buyPair = targetBalanceItem.symbol + "USDT";
+            const buyPair = targetBalanceItem.asset + "USDT";
             const buyConvertionRate = this.prices[buyPair];
-            const sellPair = "USDT" + targetBalanceItem.symbol;
+            const sellPair = "USDT" + targetBalanceItem.asset;
             const sellConvertionRate = this.prices[sellPair];
 
             if (buyConvertionRate) {

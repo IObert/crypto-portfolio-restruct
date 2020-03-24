@@ -2,7 +2,7 @@ import { PortfolioManager } from '../src/PortfolioManager';
 const myManager = new PortfolioManager({
   test: true,
   prices: {
-    "BTCUSDT": 6000,
+    "USDTBTC": 0.0001666666,
     "ETHUSDT": 130,
     "XRMUSDT": 40
   },
@@ -13,7 +13,7 @@ const myManager = new PortfolioManager({
   },
   {
     asset: "ETH",
-    free: "0",
+    free: "50",
     locked: "0"
   },
   {
@@ -25,16 +25,16 @@ const myManager = new PortfolioManager({
 });
 
 myManager.setGoalState([{
-  symbol: "BTC",
+  asset: "BTC",
   name: "BitCoin",
-  ratio: 0.5
+  ratio: 0.33
 }, {
-  symbol: "ETH",
+  asset: "ETH",
   name: "Ethereum",
-  ratio: 0.25
+  ratio: 0.33
 }, {
-  symbol: "XRM",
+  asset: "XRM",
   name: "Monero",
-  ratio: 0.25
+  ratio: 0.34
 }])
 console.log(myManager.getOrders());

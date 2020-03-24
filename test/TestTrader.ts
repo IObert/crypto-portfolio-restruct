@@ -46,23 +46,23 @@ describe('Portfolio Manager with unit prices', () => {
     });
 
     myManager.setGoalState([{
-      symbol: "BNB",
+      asset: "BNB",
       name: "Binance Coin",
       ratio: 0.2
     }, {
-      symbol: "BTC",
+      asset: "BTC",
       name: "BitCoin",
       ratio: 0.2
     }, {
-      symbol: "ETH",
+      asset: "ETH",
       name: "Ethereum",
       ratio: 0.2
     }, {
-      symbol: "TRX",
+      asset: "TRX",
       name: "TRON",
       ratio: 0.2
     }, {
-      symbol: "XRM",
+      asset: "XRM",
       name: "Monero",
       ratio: 0.2
     }]);
@@ -132,19 +132,19 @@ describe('Portfolio Manager with unit prices', () => {
     });
 
     myManager.setGoalState([{
-      symbol: "BTC",
+      asset: "BTC",
       name: "BitCoin",
       ratio: 0.2
     }, {
-      symbol: "ETH",
+      asset: "ETH",
       name: "Ethereum",
       ratio: 0.2
     }, {
-      symbol: "TRX",
+      asset: "TRX",
       name: "TRON",
       ratio: 0.2
     }, {
-      symbol: "XRM",
+      asset: "XRM",
       name: "Monero",
       ratio: 0.2
     }]);
@@ -204,15 +204,15 @@ describe('Portfolio Manager with simplified prices', () => {
     });
 
     myManager.setGoalState([{
-      symbol: "BTC",
+      asset: "BTC",
       name: "BitCoin",
       ratio: 0.5
     }, {
-      symbol: "ETH",
+      asset: "ETH",
       name: "Ethereum",
       ratio: 0.25
     }, {
-      symbol: "XRM",
+      asset: "XRM",
       name: "Monero",
       ratio: 0.25
     }]);
@@ -260,15 +260,15 @@ describe('Portfolio Manager with simplified prices', () => {
     });
 
     myManager.setGoalState([{
-      symbol: "BTC",
+      asset: "BTC",
       name: "BitCoin",
       ratio: 0.33
     }, {
-      symbol: "ETH",
+      asset: "ETH",
       name: "Ethereum",
       ratio: 0.33
     }, {
-      symbol: "XRM",
+      asset: "XRM",
       name: "Monero",
       ratio: 0.34
     }]);
@@ -316,15 +316,15 @@ describe('Portfolio Manager with simplified prices', () => {
     });
 
     myManager.setGoalState([{
-      symbol: "BTC",
+      asset: "BTC",
       name: "BitCoin",
       ratio: 0.33
     }, {
-      symbol: "ETH",
+      asset: "ETH",
       name: "Ethereum",
       ratio: 0.33
     }, {
-      symbol: "XRM",
+      asset: "XRM",
       name: "Monero",
       ratio: 0.34
     }]);

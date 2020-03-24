@@ -2,23 +2,23 @@ import BinanceClient, { Binance, AssetBalance } from "binance-api-node";
 
 
 interface Order {
-    tradingpair: String; //TODO Tradingpair;
-    side: String;
+    tradingpair: string; //TODO Tradingpair;
+    side: string;
     quantity: number;
 }
 
 interface TargetAsset {
-    symbol: String; //TODO also use enum?
-    name?: String; //TODO also use enum?
+    symbol: string; //TODO also use enum?
+    name?: string; //TODO also use enum?
     ratio: number;
     delta?: number;
 }
 
 interface Configuration {
-    binance_key?: String;
-    binance_secret?: String;
-    max_price_diff?: String;
-    base_currency?: String; //TODO AssetSymbol;
+    binance_key?: string;
+    binance_secret?: string;
+    max_price_diff?: string;
+    base_currency?: string; //TODO AssetSymbol;
     prices?: any;
     balances?: AssetBalance[];
     test?: boolean;
@@ -67,24 +67,34 @@ export class PortfolioManager {
         // Do some of the validation mentioned in the comment above here
     }
 
+    private getConvertionRate(asset1: string, asset2: string): number {
+        const buyConvertionRate = this.prices[asset1 + asset2];
+        const sellConvertionRate = this.prices[asset2 + asset1];
+
+        if (buyConvertionRate) {
+            return +buyConvertionRate;
+        } else if (sellConvertionRate) {
+            return 1 / +sellConvertionRate;
+        } else {
+            throw new Error(`Missing convertion rate: ${asset1}${asset2} / ${asset2}${asset1}`);
+        }
+    }
+
     getOrders(): Order[] {
         const sumOfCurrentAssets = this.balances.reduce((sum: number, balanceItem: AssetBalance) => {
-            return +balanceItem.free * +this.prices[balanceItem.asset + "USDT"] + sum; //TODO change to base currency here
+            return +balanceItem.free * this.getConvertionRate(balanceItem.asset, "USDT") + sum; //TODO change to base currency here
         }, 0); //error here: cannot just sum up values, should be USD value, 
 
         this.targetBalances.forEach((targetBalanceItem) => {
-
-            const tradingPair = targetBalanceItem.symbol + "USDT";
-            const convertionRate = +this.prices[tradingPair];
 
             const targetAmountInBaseCurrency = targetBalanceItem.ratio * sumOfCurrentAssets;
 
             const owning = this.balances.find((currentBalanceItem) => currentBalanceItem.asset === targetBalanceItem.symbol);
             if (!owning) {
-                throw new Error("Asset missing in current balance: " + targetBalanceItem.symbol);
+                throw new Error(`Asset missing in current balance: ${targetBalanceItem.symbol}`);
             }
 
-            const currentAmountInBaseCurrency = +owning.free * convertionRate;
+            const currentAmountInBaseCurrency = +owning.free * this.getConvertionRate(targetBalanceItem.symbol, "USDT");
 
             targetBalanceItem.delta = targetAmountInBaseCurrency - currentAmountInBaseCurrency;
         });
@@ -140,6 +150,7 @@ export class PortfolioManager {
                     }
                 }
             }
+            debugger
             throw new Error(`Cannot find matching trading pair for ${buyPair} / ${sellPair}.`)
         })
 
@@ -147,10 +158,7 @@ export class PortfolioManager {
         return orders;
     }
 
-    //second same test with one already perfect asset
-
-
-    // sendOrders(){
-    // }
+    sendOrders() {
+    }
 
 }

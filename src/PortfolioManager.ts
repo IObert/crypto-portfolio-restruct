@@ -1,15 +1,14 @@
 import BinanceClient, { Binance, AssetBalance } from "binance-api-node";
 
-
 interface Order {
-    tradingpair: string; 
+    tradingpair: string;
     side: string;
     quantity: number;
 }
 
 interface TargetAsset {
-    asset: string; 
-    name?: string; 
+    asset: string;
+    name?: string;
     ratio: number;
     delta?: number;
 }
@@ -18,7 +17,7 @@ interface Configuration {
     binance_key?: string;
     binance_secret?: string;
     max_price_diff?: string;
-    base_currency?: string; 
+    base_currency?: string;
     prices?: any;
     balances?: AssetBalance[];
     test?: boolean;
@@ -55,7 +54,6 @@ export class PortfolioManager {
             this.balances = accountInfo.balances;
         }
 
-
         // enforce correct data types, e.g. convert strings to float
         //filter current assets
         //throw warning for missing/untradable coins
@@ -64,6 +62,27 @@ export class PortfolioManager {
 
     setGoalState(assets: TargetAsset[]) {
         this.targetBalances = assets;
+        const targetAssets = assets.map((asset) => asset.asset);
+
+        const total: number = assets.reduce(function (sum: number, goalItem: TargetAsset): number {
+            return sum + goalItem.ratio
+        }, 0);
+
+        if (total > 1.02 || total < 0.98) {
+            throw new Error(`Ratios do not add up: ${Math.floor(total * 1000) / 1000}`);
+        }
+
+        this.balances.forEach(oBalance => {
+            if (!targetAssets.includes(oBalance.asset)) {
+                debugger
+                this.targetBalances.push({
+                    asset: oBalance.asset,
+                    ratio: 0
+                });
+            }
+        })
+
+
         // Do some of the validation mentioned in the comment above here
     }
 

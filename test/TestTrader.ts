@@ -667,81 +667,159 @@ describe("Portfolio Manager with realistic prices", () => {
     }]);
   });
 
-  // it("should compute orders without rebalancing, one ccurrent holding and reduced orders", () => {
-  //   // asumptions:
-  //   // no need to differentiate between sell and buy orders
-  //   // No check for symbol substituion
-  //   // trading via USDT
-  //   // start state= one holding
+  it("should compute orders and three current holdings and top 10 currencies via BNB", () => {
+    // asumptions:
+    // trading via BNB
 
-  //   const myManager = new PortfolioManager({
-  //     test: true,
-  //     prices: {
-  //       BNBUSDT: 1,
-  //       BTCUSDT: 1,
-  //       ETHUSDT: 1,
-  //       TRXUSDT: 1,
-  //       XRMUSDT: 1
-  //     },
-  //     balances: [{
-  //       asset: "BTC",
-  //       free: "4",
-  //       locked: "0"
-  //     }, {
-  //       asset: "BNB",
-  //       free: "1",
-  //       locked: "0"
-  //     }, {
-  //       asset: "ETH",
-  //       free: "0",
-  //       locked: "0"
-  //     }, {
-  //       asset: "TRX",
-  //       free: "0",
-  //       locked: "0"
-  //     }, {
-  //       asset: "XRM",
-  //       free: "0",
-  //       locked: "0"
-  //     }]
-  //   });
+    const myManager = new PortfolioManager({
+      test: true,
+      baseCurrency: "BNB",
+      prices: {
+        STEEMBNB: "0.01185000", // TODO use this one when using alt base coins
+        XRPBNB: "0.01450000",
+        BNBBTC: "0.00193670",
+        BNBETH: "0.09227800",
+        XMRBNB: "3.89600000",
+        EOSBNB: "0.18270000",
+        LTCBNB: "3.23400000",
+        XTZBNB: "0.13117000",
+        BCHBNB: "17.82600000",
+        XLMBNB: "0.00333300"
+      },
+      balances: [{
+        asset: "BTC",
+        free: "1",
+        locked: "0"
+      }, {
+        asset: "STEEM",
+        free: "4589.53",
+        locked: "0"
+      }, {
+        asset: "BNB",
+        free: "248",
+        locked: "0"
+      }, {
+        asset: "ETH",
+        free: "0",
+        locked: "0"
+      }, {
+        asset: "XRP",
+        free: "0",
+        locked: "0"
+      }, {
+        asset: "EOS",
+        free: "0",
+        locked: "0"
+      }, {
+        asset: "LTC",
+        free: "0",
+        locked: "0"
+      }, {
+        asset: "BNB",
+        free: "0",
+        locked: "0"
+      }, {
+        asset: "XTZ",
+        free: "0",
+        locked: "0"
+      }, {
+        asset: "BCH",
+        free: "0",
+        locked: "0"
+      }, {
+        asset: "XMR",
+        free: "0",
+        locked: "0"
+      }, {
+        asset: "XLM",
+        free: "0",
+        locked: "0"
+      }]
+    });
 
-  //   myManager.setGoalState([{
-  //     asset: "BTC",
-  //     name: "BitCoin",
-  //     ratio: 0.2
-  //   }, {
-  //     asset: "ETH",
-  //     name: "Ethereum",
-  //     ratio: 0.2
-  //   }, {
-  //     asset: "TRX",
-  //     name: "TRON",
-  //     ratio: 0.2
-  //   }, {
-  //     asset: "XRM",
-  //     name: "Monero",
-  //     ratio: 0.2
-  //   }]);
+    myManager.setGoalState([{
+      asset: "ETH",
+      name: "Ethereum",
+      ratio: 0.162
+    }, {
+      asset: "XRP",
+      name: "Ripple",
+      ratio: 0.151
+    }, {
+      asset: "BTC",
+      name: "Bitcoin",
+      ratio: 0.14
+    }, {
+      asset: "BCH",
+      name: "Bitcoin Cash ABC",
+      ratio: 0.134
+    }, {
+      asset: "LTC",
+      name: "Litecoin",
+      ratio: 0.113
+    }, {
+      asset: "EOS",
+      name: "EOS",
+      ratio: 0.091
+    }, {
+      asset: "BNB",
+      name: "Binance",
+      ratio: 0.085
+    }, {
+      asset: "XTZ",
+      name: "Tezos",
+      ratio: 0.049
+    }, {
+      asset: "XMR",
+      name: "Monero",
+      ratio: 0.038
+    }, {
+      asset: "XLM",
+      name: "Stellar",
+      ratio: 0.036
+    }]);
 
-  //   assert.sameDeepMembers(myManager.getOrders(), [{
-  //     tradingpair: "BTCUSDT",
-  //     side: "SELL",
-  //     quantity: 3
-  //   }, {
-  //     tradingpair: "ETHUSDT",
-  //     side: "BUY",
-  //     quantity: 1
-  //   }, {
-  //     tradingpair: "TRXUSDT",
-  //     side: "BUY",
-  //     quantity: 1
-  //   }, {
-  //     tradingpair: "XRMUSDT",
-  //     side: "BUY",
-  //     quantity: 1
-  //   }
-  //   ]);
-  // });
+    assert.sameDeepMembers(myManager.getOrders(), [{
+      tradingpair: "BNBETH",
+      side: "SELL",
+      quantity: 132.63396226524227
+    }, {
+      tradingpair: "XRPBNB",
+      side: "BUY",
+      quantity: 8526.065688399993
+    }, {
+      tradingpair: "BNBBTC",
+      side: "BUY",
+      quantity: 401.72028893276763
+    }, {
+      tradingpair: "BCHBNB",
+      side: "BUY",
+      quantity: 6.154469523480914
+    }, {
+      tradingpair: "LTCBNB",
+      side: "BUY",
+      quantity: 28.607384762157434
+    }, {
+      tradingpair: "EOSBNB",
+      side: "BUY",
+      quantity: 407.79563631052207
+    }, {
+      tradingpair: "XTZBNB",
+      side: "BUY",
+      quantity: 305.84493363135726
+    }, {
+      tradingpair: "XMRBNB",
+      side: "BUY",
+      quantity: 7.985541622428839
+    }, {
+      tradingpair: "XLMBNB",
+      side: "BUY",
+      quantity: 8843.148465862736
+    }, {
+      tradingpair: "STEEMBNB",
+      side: "SELL",
+      quantity: 4589.53
+    }]);
+  });
 
 });

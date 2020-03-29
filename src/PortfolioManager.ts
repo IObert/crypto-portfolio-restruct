@@ -16,8 +16,7 @@ interface TargetAsset {
 interface Configuration {
   binance_key?: string;
   binance_secret?: string;
-  max_price_diff?: string;
-  base_currency?: string;
+  baseCurrency?: string;
   prices?: any;
   balances?: AssetBalance[];
   test?: boolean;
@@ -27,9 +26,12 @@ export class PortfolioManager {
   client?: Binance; // TODO stay optional?
   prices: any;
   balances: AssetBalance[];
+  baseCurrency: string = "USDT";
   targetBalances: TargetAsset[] = []; // TODO stay optional?
 
   constructor(config: Configuration) {
+
+    this.baseCurrency = config.baseCurrency || this.baseCurrency;
 
     if (config.test) {
       this.prices = config.prices;
@@ -92,12 +94,15 @@ export class PortfolioManager {
     if (sellConvertionRate) {
       return 1 / +sellConvertionRate;
     }
+    if (asset1 === asset2) {
+      return 1;
+    }
     throw new Error(`Missing convertion rate: ${asset1}${asset2} / ${asset2}${asset1}`);
   }
 
   getOrders(): Order[] {
     const sumOfCurrentAssets = this.balances.reduce((sum: number, balanceItem: AssetBalance) => {
-      return +balanceItem.free * this.getConvertionRate(balanceItem.asset, "USDT") + sum; // TODO change to base currency here
+      return +balanceItem.free * this.getConvertionRate(balanceItem.asset, this.baseCurrency) + sum;
     }, 0);
 
     this.targetBalances.forEach((targetBalanceItem) => {
@@ -109,18 +114,18 @@ export class PortfolioManager {
         throw new Error(`Asset missing in current balance: ${targetBalanceItem.asset}`);
       }
 
-      const currentAmountInBaseCurrency = +owning.free * this.getConvertionRate(targetBalanceItem.asset, "USDT");
+      const currentAmountInBaseCurrency = +owning.free * this.getConvertionRate(targetBalanceItem.asset, this.baseCurrency);
 
       targetBalanceItem.delta = targetAmountInBaseCurrency - currentAmountInBaseCurrency;
     });
 
-    this.targetBalances = this.targetBalances.filter(targetBalanceItem => targetBalanceItem.delta !== 0);
+    this.targetBalances = this.targetBalances.filter(targetBalanceItem => (targetBalanceItem.delta !== 0) && (targetBalanceItem.asset !== this.baseCurrency));
 
     const orders = this.targetBalances.map(targetBalanceItem => {
 
-      const buyPair = `${targetBalanceItem.asset}USDT`;
+      const buyPair = `${targetBalanceItem.asset}${this.baseCurrency}`;
       const buyConvertionRate = this.prices[buyPair];
-      const sellPair = `USDT${targetBalanceItem.asset}`;
+      const sellPair = `${this.baseCurrency}${targetBalanceItem.asset}`;
       const sellConvertionRate = this.prices[sellPair];
 
       if (buyConvertionRate) {

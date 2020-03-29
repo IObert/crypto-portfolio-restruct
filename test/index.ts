@@ -1,19 +1,18 @@
-import { PortfolioManager } from '../src/PortfolioManager';
+import { PortfolioManager } from "../src/PortfolioManager";
 const myManager = new PortfolioManager({
   test: true,
   prices: {
-    "STEEMUSDT": "0.176360", //till here fakes
-    "STEEMBTC": "0.00002395", // use this one when using alt base coins
-    "BNBUSDT": "11.88240000",
-    "XRPUSDT": "0.17236000",
-    "BTCUSDT": "6121.51000000",
-    "ETHUSDT": "126.66000000",
-    "XMRUSDT": "46.83000000",
-    "EOSUSDT": "2.12130000",
-    "LTCUSDT": "37.81000000",
-    "XTZUSDT": "1.53500000",
-    "BCHUSDT": "206.53000000",
-    "XLMUSDT": "0.03920000"
+    STEEMUSDT: "0.176360",
+    BNBUSDT: "11.88240000",
+    XRPUSDT: "0.17236000",
+    BTCUSDT: "6121.51000000",
+    ETHUSDT: "126.66000000",
+    XMRUSDT: "46.83000000",
+    EOSUSDT: "2.12130000",
+    LTCUSDT: "37.81000000",
+    XTZUSDT: "1.53500000",
+    BCHUSDT: "206.53000000",
+    XLMUSDT: "0.03920000"
   },
   balances: [{
     asset: "BTC",
@@ -66,7 +65,7 @@ const myManager = new PortfolioManager({
   }]
 });
 
-myManager.setGoalState([{ //TODO sums up to 99.9, check if that makes a problem
+myManager.setGoalState([{ // TODO sums up to 99.9, check if that makes a problem
   asset: "ETH",
   name: "Ethereum",
   ratio: 16.2
@@ -107,6 +106,5 @@ myManager.setGoalState([{ //TODO sums up to 99.9, check if that makes a problem
   name: "Stellar",
   ratio: 3.6
 }]);
-
 
 console.log(myManager.getOrders());

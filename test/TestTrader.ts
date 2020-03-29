@@ -1,12 +1,12 @@
 
-import { PortfolioManager } from '../src/PortfolioManager';
-import { expect, assert } from 'chai';
-import 'mocha';
+import { PortfolioManager } from "../src/PortfolioManager";
+import { expect, assert } from "chai";
+import "mocha";
 
-describe('Portfolio Manager with unit prices', () => {
+describe("Portfolio Manager with unit prices", () => {
 
-  it('should compute orders with one current holding', () => {
-    //asumptions: 
+  it("should compute orders with one current holding", () => {
+    // asumptions:
     // no need to differentiate between sell and buy orders
     // No check for symbol substituion
     // trading via USDT
@@ -15,11 +15,11 @@ describe('Portfolio Manager with unit prices', () => {
     const myManager = new PortfolioManager({
       test: true,
       prices: {
-        "BNBUSDT": 1,
-        "BTCUSDT": 1,
-        "ETHUSDT": 1,
-        "TRXUSDT": 1,
-        "XRMUSDT": 1
+        BNBUSDT: 1,
+        BTCUSDT: 1,
+        ETHUSDT: 1,
+        TRXUSDT: 1,
+        XRMUSDT: 1
       },
       balances: [{
         asset: "BTC",
@@ -90,8 +90,8 @@ describe('Portfolio Manager with unit prices', () => {
 
   });
 
-  it('should compute orders with one ccurrent holding and reduced orders', () => {
-    //asumptions: 
+  it("should compute orders with one ccurrent holding and reduced orders", () => {
+    // asumptions:
     // no need to differentiate between sell and buy orders
     // No check for symbol substituion
     // trading via USDT
@@ -100,11 +100,11 @@ describe('Portfolio Manager with unit prices', () => {
     const myManager = new PortfolioManager({
       test: true,
       prices: {
-        "BNBUSDT": 1,
-        "BTCUSDT": 1,
-        "ETHUSDT": 1,
-        "TRXUSDT": 1,
-        "XRMUSDT": 1
+        BNBUSDT: 1,
+        BTCUSDT: 1,
+        ETHUSDT: 1,
+        TRXUSDT: 1,
+        XRMUSDT: 1
       },
       balances: [{
         asset: "BTC",
@@ -172,10 +172,10 @@ describe('Portfolio Manager with unit prices', () => {
 
 });
 
-describe('Portfolio Manager with simplified prices', () => {
+describe("Portfolio Manager with simplified prices", () => {
 
-  it('should compute orders with one current holding', () => {
-    //asumptions: 
+  it("should compute orders with one current holding", () => {
+    // asumptions:
     // no need to differentiate between sell and buy orders
     // trading via USDT
     // start state= one holding
@@ -183,9 +183,9 @@ describe('Portfolio Manager with simplified prices', () => {
     const myManager = new PortfolioManager({
       test: true,
       prices: {
-        "BTCUSDT": 6000,
-        "ETHUSDT": 130,
-        "XRMUSDT": 40
+        BTCUSDT: 6000,
+        ETHUSDT: 130,
+        XRMUSDT: 40
       },
       balances: [{
         asset: "BTC",
@@ -231,16 +231,16 @@ describe('Portfolio Manager with simplified prices', () => {
     }]);
   });
 
-  it('should compute orders with two current holdings and a reversed trading pairs', () => {
-    //asumptions: 
+  it("should compute orders with two current holdings and a reversed trading pairs", () => {
+    // asumptions:
     // trading via USDT
 
     const myManager = new PortfolioManager({
       test: true,
       prices: {
-        "BTCUSDT": 6000,
-        "USDTETH": 0.0076923077,
-        "USDTXRM": 0.025
+        BTCUSDT: 6000,
+        USDTETH: 0.0076923077,
+        USDTXRM: 0.025
       },
       balances: [{
         asset: "BTC",
@@ -286,16 +286,16 @@ describe('Portfolio Manager with simplified prices', () => {
     }]);
   });
 
-  it('should compute orders with two current holdings and a reversed trading pairs with convertion flipping', () => {
-    //asumptions: 
+  it("should compute orders with two current holdings and a reversed trading pairs with convertion flipping", () => {
+    // asumptions:
     // trading via USDT
 
     const myManager = new PortfolioManager({
       test: true,
       prices: {
-        "USDTBTC": 0.0001666666,
-        "ETHUSDT": 130,
-        "XRMUSDT": 40
+        USDTBTC: 0.0001666666,
+        ETHUSDT: 130,
+        XRMUSDT: 40
       },
       balances: [{
         asset: "BTC",
@@ -342,16 +342,16 @@ describe('Portfolio Manager with simplified prices', () => {
 
   });
 
-  it('should throw error', () => {
-    //asumptions: 
+  it("should throw error", () => {
+    // asumptions:
     // trading via USDT
 
     const myManager = new PortfolioManager({
       test: true,
       prices: {
-        "BTCUSDT": 6000,
-        "USDTETH": 0.0076923077,
-        "USDTXRM": 0.025
+        BTCUSDT: 6000,
+        USDTETH: 0.0076923077,
+        USDTXRM: 0.025
       },
       balances: [{
         asset: "BTC",
@@ -386,32 +386,31 @@ describe('Portfolio Manager with simplified prices', () => {
       ratio: 0.25
     }]);
 
-
     expect(() => myManager.getOrders()).to.throw(`Asset missing in current balance: IMG`);
   });
 });
 
-describe('Portfolio Manager with realistic prices', () => {
+describe("Portfolio Manager with realistic prices", () => {
 
-  it('should compute orders and three current holdings and top 10 currencies and throw a warning', () => {
-    //asumptions: 
+  it("should compute orders and three current holdings and top 10 currencies and throw a warning", () => {
+    // asumptions:
     // trading via USDT
 
     const myManager = new PortfolioManager({
       test: true,
       prices: {
-        "STEEMUSDT": "0.176360", // till here fakes
-        "STEEMBTC": "0.00002395", // use this one when using alt base coins
-        "BNBUSDT": "11.88240000",
-        "XRPUSDT": "0.17236000",
-        "BTCUSDT": "6121.51000000",
-        "ETHUSDT": "126.66000000",
-        "XMRUSDT": "46.83000000",
-        "EOSUSDT": "2.12130000",
-        "LTCUSDT": "37.81000000",
-        "XTZUSDT": "1.53500000",
-        "BCHUSDT": "206.53000000",
-        "XLMUSDT": "0.03920000"
+        STEEMUSDT: "0.176360", // till here fakes
+        STEEMBTC: "0.00002395", // use this one when using alt base coins
+        BNBUSDT: "11.88240000",
+        XRPUSDT: "0.17236000",
+        BTCUSDT: "6121.51000000",
+        ETHUSDT: "126.66000000",
+        XMRUSDT: "46.83000000",
+        EOSUSDT: "2.12130000",
+        LTCUSDT: "37.81000000",
+        XTZUSDT: "1.53500000",
+        BCHUSDT: "206.53000000",
+        XLMUSDT: "0.03920000"
       },
       balances: [{
         asset: "BTC",
@@ -464,8 +463,6 @@ describe('Portfolio Manager with realistic prices', () => {
       }]
     });
 
-
-
     expect(() => myManager.setGoalState([{
       asset: "ETH",
       name: "Ethereum",
@@ -510,27 +507,25 @@ describe('Portfolio Manager with realistic prices', () => {
 
   });
 
-
-
-  it('should compute orders and three current holdings and top 10 currencies', () => {
-    //asumptions: 
+  it("should compute orders and three current holdings and top 10 currencies", () => {
+    // asumptions:
     // trading via USDT
 
     const myManager = new PortfolioManager({
       test: true,
       prices: {
-        "STEEMUSDT": "0.176360", //till here fakes
-        "STEEMBTC": "0.00002395", // use this one when using alt base coins
-        "BNBUSDT": "11.88240000",
-        "XRPUSDT": "0.17236000",
-        "BTCUSDT": "6121.51000000",
-        "ETHUSDT": "126.66000000",
-        "XMRUSDT": "46.83000000",
-        "EOSUSDT": "2.12130000",
-        "LTCUSDT": "37.81000000",
-        "XTZUSDT": "1.53500000",
-        "BCHUSDT": "206.53000000",
-        "XLMUSDT": "0.03920000"
+        STEEMUSDT: "0.176360",
+        STEEMBTC: "0.00002395", // TODO use this one when using alt base coins
+        BNBUSDT: "11.88240000",
+        XRPUSDT: "0.17236000",
+        BTCUSDT: "6121.51000000",
+        ETHUSDT: "126.66000000",
+        XMRUSDT: "46.83000000",
+        EOSUSDT: "2.12130000",
+        LTCUSDT: "37.81000000",
+        XTZUSDT: "1.53500000",
+        BCHUSDT: "206.53000000",
+        XLMUSDT: "0.03920000"
       },
       balances: [{
         asset: "BTC",
@@ -625,58 +620,55 @@ describe('Portfolio Manager with realistic prices', () => {
       ratio: 0.036
     }]);
 
-
     assert.sameDeepMembers(myManager.getOrders(), [{
-      tradingpair:
-        'ETHUSDT',
-      side: 'BUY',
+      tradingpair: "ETHUSDT",
+      side: "BUY",
       quantity: 12.633793329777358
     }, {
-      tradingpair: 'XRPUSDT',
-      side: 'BUY',
+      tradingpair: "XRPUSDT",
+      side: "BUY",
       quantity: 8653.637510621953
     }, {
-      tradingpair: 'BTCUSDT',
-      side: 'SELL',
+      tradingpair: "BTCUSDT",
+      side: "SELL",
       quantity: 0.7740940291673134
     }, {
-      tradingpair: 'BCHUSDT',
-      side: 'BUY',
+      tradingpair: "BCHUSDT",
+      side: "BUY",
       quantity: 6.4088468079562295
     }, {
-      tradingpair: 'LTCUSDT',
-      side: 'BUY',
+      tradingpair: "LTCUSDT",
+      side: "BUY",
       quantity: 29.52092785824914
     }, {
-      tradingpair: 'EOSUSDT',
-      side: 'BUY',
+      tradingpair: "EOSUSDT",
+      side: "BUY",
       quantity: 423.7381222282562
     }, {
-      tradingpair: 'BNBUSDT',
-      side: 'SELL',
+      tradingpair: "BNBUSDT",
+      side: "SELL",
       quantity: 177.3401038158958
     }, {
-      tradingpair: 'XTZUSDT',
-      side: 'BUY',
+      tradingpair: "XTZUSDT",
+      side: "BUY",
       quantity: 315.3159484229316
     }, {
-      tradingpair: 'XMRUSDT',
-      side: 'BUY',
+      tradingpair: "XMRUSDT",
+      side: "BUY",
       quantity: 8.015261136245996
     }, {
-      tradingpair: 'XLMUSDT',
-      side: 'BUY',
+      tradingpair: "XLMUSDT",
+      side: "BUY",
       quantity: 9071.407387469388
     }, {
-      tradingpair: 'STEEMUSDT',
-      side: 'SELL',
+      tradingpair: "STEEMUSDT",
+      side: "SELL",
       quantity: 4589.53
     }]);
-
   });
 
-  // it('should compute orders without rebalancing, one ccurrent holding and reduced orders', () => {
-  //   //asumptions: 
+  // it("should compute orders without rebalancing, one ccurrent holding and reduced orders", () => {
+  //   // asumptions:
   //   // no need to differentiate between sell and buy orders
   //   // No check for symbol substituion
   //   // trading via USDT
@@ -685,11 +677,11 @@ describe('Portfolio Manager with realistic prices', () => {
   //   const myManager = new PortfolioManager({
   //     test: true,
   //     prices: {
-  //       "BNBUSDT": 1,
-  //       "BTCUSDT": 1,
-  //       "ETHUSDT": 1,
-  //       "TRXUSDT": 1,
-  //       "XRMUSDT": 1
+  //       BNBUSDT: 1,
+  //       BTCUSDT: 1,
+  //       ETHUSDT: 1,
+  //       TRXUSDT: 1,
+  //       XRMUSDT: 1
   //     },
   //     balances: [{
   //       asset: "BTC",

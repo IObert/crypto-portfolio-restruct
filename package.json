@@ -9,7 +9,8 @@
     "watch": "tsc -w",
     "dev": "yarn build && yarn start",
     "start": "node dist/index.js",
-    "test": "mocha -r ts-node/register test/Test*.ts"
+    "test": "mocha -r ts-node/register test/Test*.ts",
+    "lint": "tslint --project '.'"
   },
   "dependencies": {
     "binance-api-node": "^0.9.17",

@@ -65,7 +65,7 @@ const myManager = new PortfolioManager({
   }]
 });
 
-myManager.setGoalState([{ // TODO sums up to 99.9, check if that makes a problem
+myManager.setGoalState([{
   asset: "ETH",
   name: "Ethereum",
   ratio: 16.2

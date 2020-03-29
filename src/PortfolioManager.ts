@@ -128,42 +128,38 @@ export class PortfolioManager {
       const sellPair = `${this.baseCurrency}${targetBalanceItem.asset}`;
       const sellConvertionRate = this.prices[sellPair];
 
+      if (targetBalanceItem.delta === undefined) {
+        throw new Error(`Delta has not been calculated: ${targetBalanceItem}`);
+      }
+
       if (buyConvertionRate) {
-        // @ts-ignore
         if (targetBalanceItem.delta > 0) {
           return {
             tradingpair: buyPair,
             side: "BUY",
-            // @ts-ignore
             quantity: targetBalanceItem.delta / buyConvertionRate
           };
         }
-        // @ts-ignore
         if (targetBalanceItem.delta < 0) {
           return {
             tradingpair: buyPair,
             side: "SELL",
-            // @ts-ignore
             quantity: -targetBalanceItem.delta / buyConvertionRate
           };
         }
       }
       if (sellConvertionRate) {
-        // @ts-ignore
         if (targetBalanceItem.delta > 0) {
           return {
             tradingpair: sellPair,
             side: "SELL",
-            // @ts-ignore
             quantity: targetBalanceItem.delta
           };
         }
-        // @ts-ignore
         if (targetBalanceItem.delta < 0) {
           return {
             tradingpair: sellPair,
             side: "BUY",
-            // @ts-ignore
             quantity: -targetBalanceItem.delta
           };
         }
@@ -171,7 +167,6 @@ export class PortfolioManager {
       throw new Error(`Cannot find matching trading pair for ${buyPair} / ${sellPair}.`);
     });
 
-    // @ts-ignore
     return orders;
   }
 

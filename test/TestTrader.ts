@@ -515,7 +515,6 @@ describe("Portfolio Manager with realistic prices", () => {
       test: true,
       prices: {
         STEEMUSDT: "0.176360",
-        STEEMBTC: "0.00002395", // TODO use this one when using alt base coins
         BNBUSDT: "11.88240000",
         XRPUSDT: "0.17236000",
         BTCUSDT: "6121.51000000",
@@ -675,7 +674,7 @@ describe("Portfolio Manager with realistic prices", () => {
       test: true,
       baseCurrency: "BNB",
       prices: {
-        STEEMBNB: "0.01185000", // TODO use this one when using alt base coins
+        STEEMBNB: "0.01185000",
         XRPBNB: "0.01450000",
         BNBBTC: "0.00193670",
         BNBETH: "0.09227800",

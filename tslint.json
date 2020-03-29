@@ -1,8 +1,9 @@
 {
-  "defaultSeverity": "error",
+  "defaultSeverity": "warnings",
   "extends": "tslint-config-airbnb",
   "jsRules": {},
   "rules": {
+    "import-name": 0,
     "quotemark": [
       true,
       "double"
@@ -14,8 +15,7 @@
       130
     ],
     "no-suspicious-comment": 1,
-    "align": 0,
-    "import-name": 0
+    "align": 0
   },
   "rulesDirectory": []
 }

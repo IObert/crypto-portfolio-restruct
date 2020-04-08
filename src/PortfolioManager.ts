@@ -1,7 +1,7 @@
 import BinanceClient, { Binance, AssetBalance } from "binance-api-node";
 
 interface Order {
-  tradingpair: string;
+  symbol: string;
   side: string;
   quantity: number;
 }
@@ -14,55 +14,63 @@ interface TargetAsset {
 }
 
 interface Configuration {
-  binance_key?: string;
-  binance_secret?: string;
+  binanceKey?: string;
+  binanceSecret?: string;
   baseCurrency?: string;
   prices?: any;
   balances?: AssetBalance[];
+  ignoreCoins?: string[];
   test?: boolean;
 }
 
 export class PortfolioManager {
-  client?: Binance; // TODO stay optional?
+  client?: Binance;
   prices: any;
-  balances: AssetBalance[];
+  initialized: boolean = false;
+  balances: AssetBalance[] = [];
+  symbols: import("binance-api-node").Symbol[] = [];
   baseCurrency: string = "USDT";
-  targetBalances: TargetAsset[] = []; // TODO stay optional?
+  targetBalances: TargetAsset[] = [];
 
-  constructor(config: Configuration) {
+  // TODO write readme
+  // TODO idea, floor to cent value to avoid rounding errors
+
+  async init(config: Configuration): Promise<any> {
 
     this.baseCurrency = config.baseCurrency || this.baseCurrency;
+    const ignoreCoins = config.ignoreCoins || [];
 
-    if (config.test) {
-      this.prices = config.prices;
-      this.balances = config.balances || [];
+    return new Promise(async (resolve) => {
 
-    } else {
-      this.client = BinanceClient();
-      // { apikey, apisecret } = any;
-      this.balances = [];
-      this.client.exchangeInfo().then(console.log);
+      if (config.test) {
+        this.prices = config.prices;
+        this.balances = config.balances || [];
+      } else {
+        if (!config.binanceKey || !config.binanceSecret) {
+          throw new Error("Missing credentials");
+        }
+        this.client = BinanceClient({
+          apiKey: config.binanceKey,
+          apiSecret: config.binanceSecret
+        });
+        const accountInfo = await this.client.accountInfo();
+        const exInfo = await this.client.exchangeInfo();
+        this.prices = await this.client.prices();
+        this.balances = accountInfo.balances;
+        this.symbols = exInfo.symbols;
+      }
 
-    }
+      this.balances = this.balances.filter(oBalanceItem => !ignoreCoins.includes(oBalanceItem.asset));
 
-    // this.fullName = "test"
-    // TODO fetch info form binance here
-  }
-
-  async init() {// should return promise that might resolve immeditatly
-    if (this.client) {
-      this.prices = await this.client.prices();
-      const accountInfo = await this.client.accountInfo();
-      this.balances = accountInfo.balances;
-    }
-
-    // enforce correct data types, e.g. convert strings to float
-    // filter current assets
-    // throw warning for missing/untradable coins
-    // rebalance
+      this.initialized = true;
+      resolve();
+    });
   }
 
   setGoalState(assets: TargetAsset[]) {
+    if (!this.initialized) {
+      throw new Error("Instance was never initialized.");
+    }
     this.targetBalances = assets;
     const targetAssets = assets.map(asset => asset.asset);
 
@@ -74,10 +82,14 @@ export class PortfolioManager {
       throw new Error(`Ratios do not add up: ${Math.floor(total * 1000) / 1000}`);
     }
 
-    this.balances.forEach(oBalance => {
-      if (!targetAssets.includes(oBalance.asset)) {
+    this.balances.forEach(oBalanceItem => {
+      if (!targetAssets.includes(oBalanceItem.asset)) {
+        const amount = +oBalanceItem.free;
+        if (amount === 0) {
+          return;
+        }
         this.targetBalances.push({
-          asset: oBalance.asset,
+          asset: oBalanceItem.asset,
           ratio: 0
         });
       }
@@ -100,9 +112,42 @@ export class PortfolioManager {
     throw new Error(`Missing convertion rate: ${asset1}${asset2} / ${asset2}${asset1}`);
   }
 
+
+
+  private roundAmount(symbol: string, amount: number, func: Function): number {
+    if (!this.client) { //TODO add test data for rounding, remove this when ready
+      return amount;
+    }
+    const oInfo = this.symbols.find(oS => oS.symbol === symbol);
+    if (!oInfo || oInfo.status !== "TRADING") {
+      throw new Error("Inactive trading pair: " + symbol);
+    }
+
+
+    // @ts-ignore
+    const lotFilter = oInfo.filters.find((oFilter) => oFilter.filterType === "LOT_SIZE");
+    // @ts-ignore
+    const dec = 1 / +lotFilter.stepSize;
+
+    // @ts-ignore
+    const minFilter = oInfo.filters.find((oFilter) => oFilter.filterType === "MIN_NOTIONAL");
+    // @ts-ignore
+    const min = +minFilter.minNotional;
+
+    const candidate = func(amount * dec) / dec;
+    return candidate > min ? candidate : 0
+  }
+
   getOrders(): Order[] {
+    if (!this.initialized) {
+      throw new Error("Instance was never initialized.");
+    }
     const sumOfCurrentAssets = this.balances.reduce((sum: number, balanceItem: AssetBalance) => {
-      return +balanceItem.free * this.getConvertionRate(balanceItem.asset, this.baseCurrency) + sum;
+      const amount = +balanceItem.free;
+      if (amount === 0) {
+        return sum;
+      }
+      return amount * this.getConvertionRate(balanceItem.asset, this.baseCurrency) + sum;
     }, 0);
 
     this.targetBalances.forEach((targetBalanceItem) => {
@@ -119,7 +164,9 @@ export class PortfolioManager {
       targetBalanceItem.delta = targetAmountInBaseCurrency - currentAmountInBaseCurrency;
     });
 
-    this.targetBalances = this.targetBalances.filter(targetBalanceItem => (targetBalanceItem.delta !== 0) && (targetBalanceItem.asset !== this.baseCurrency));
+    this.targetBalances = this.targetBalances.filter(targetBalanceItem =>
+      (targetBalanceItem.delta !== 0) &&
+      (targetBalanceItem.asset !== this.baseCurrency));
 
     const orders = this.targetBalances.map(targetBalanceItem => {
 
@@ -135,43 +182,59 @@ export class PortfolioManager {
       if (buyConvertionRate) {
         if (targetBalanceItem.delta > 0) {
           return {
-            tradingpair: buyPair,
+            symbol: buyPair,
             side: "BUY",
-            quantity: targetBalanceItem.delta / buyConvertionRate
+            type: "MARKET",
+            quantity: this.roundAmount(buyPair, targetBalanceItem.delta / buyConvertionRate, Math.floor)
           };
         }
         if (targetBalanceItem.delta < 0) {
           return {
-            tradingpair: buyPair,
+            symbol: buyPair,
             side: "SELL",
-            quantity: -targetBalanceItem.delta / buyConvertionRate
+            type: "MARKET",
+            quantity: this.roundAmount(buyPair, -targetBalanceItem.delta / buyConvertionRate, Math.ceil)
           };
         }
       }
       if (sellConvertionRate) {
         if (targetBalanceItem.delta > 0) {
           return {
-            tradingpair: sellPair,
+            symbol: sellPair,
             side: "SELL",
-            quantity: targetBalanceItem.delta
+            type: "MARKET",
+            quantity: this.roundAmount(sellPair, targetBalanceItem.delta, Math.ceil)
           };
         }
         if (targetBalanceItem.delta < 0) {
           return {
-            tradingpair: sellPair,
+            symbol: sellPair,
             side: "BUY",
-            quantity: -targetBalanceItem.delta
+            type: "MARKET",
+            quantity: this.roundAmount(sellPair, -targetBalanceItem.delta, Math.floor)
           };
         }
       }
       throw new Error(`Cannot find matching trading pair for ${buyPair} / ${sellPair}.`);
     });
-
-    return orders;
+    return orders.filter((o) => o.quantity !== 0);
   }
 
-  sendOrders() {
-    // TODO missing implementation
+  async sendOrders() {
+    if (!this.initialized || !this.client) {
+      throw new Error("Instance was never initialized.");
+    }
+
+    // @ts-ignore
+    this.getOrders().map(this.client.orderTest);
   }
 
+  async testOrders() {
+    if (!this.initialized || !this.client) {
+      throw new Error("Instance was never initialized.");
+    }
+
+    // @ts-ignore
+    this.getOrders().map(this.client.orderTest);
+  }
 }

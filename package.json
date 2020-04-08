@@ -9,11 +9,15 @@
     "watch": "tsc -w",
     "dev": "yarn build && yarn start",
     "start": "node dist/index.js",
+    "index": "ts-node test/index.ts",
     "test": "mocha -r ts-node/register test/Test*.ts",
     "lint": "tslint --project '.'"
   },
   "dependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^13.11.1",
     "binance-api-node": "^0.9.17",
+    "dotenv": "^8.2.0",
     "tsc": "^1.20150623.0",
     "tslint-config-airbnb": "^5.11.2"
   },

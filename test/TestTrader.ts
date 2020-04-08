@@ -12,7 +12,8 @@ describe("Portfolio Manager with unit prices", () => {
     // trading via USDT
     // start state= one holding
 
-    const myManager = new PortfolioManager({
+    const myManager = new PortfolioManager();
+    myManager.init({
       test: true,
       prices: {
         BNBUSDT: 1,
@@ -67,23 +68,23 @@ describe("Portfolio Manager with unit prices", () => {
     }]);
 
     assert.sameDeepMembers(myManager.getOrders(), [{
-      tradingpair: "BNBUSDT",
+      symbol: "BNBUSDT",
       side: "BUY",
       quantity: 1
     }, {
-      tradingpair: "BTCUSDT",
+      symbol: "BTCUSDT",
       side: "SELL",
       quantity: 4
     }, {
-      tradingpair: "ETHUSDT",
+      symbol: "ETHUSDT",
       side: "BUY",
       quantity: 1
     }, {
-      tradingpair: "TRXUSDT",
+      symbol: "TRXUSDT",
       side: "BUY",
       quantity: 1
     }, {
-      tradingpair: "XRMUSDT",
+      symbol: "XRMUSDT",
       side: "BUY",
       quantity: 1
     }]);
@@ -97,7 +98,8 @@ describe("Portfolio Manager with unit prices", () => {
     // trading via USDT
     // start state= one holding
 
-    const myManager = new PortfolioManager({
+    const myManager = new PortfolioManager();
+    myManager.init({
       test: true,
       prices: {
         BNBUSDT: 1,
@@ -148,25 +150,25 @@ describe("Portfolio Manager with unit prices", () => {
     }]);
 
     assert.sameDeepMembers(myManager.getOrders(), [{
-      tradingpair: "BTCUSDT",
+      symbol: "BTCUSDT",
       side: "SELL",
       quantity: 2.75
     }, {
-      tradingpair: "ETHUSDT",
+      symbol: "ETHUSDT",
       side: "BUY",
       quantity: 1.25
     }, {
-      tradingpair: "TRXUSDT",
+      symbol: "TRXUSDT",
       side: "BUY",
       quantity: 1.25
     }, {
-      tradingpair: "XRMUSDT",
+      symbol: "XRMUSDT",
       side: "BUY",
       quantity: 1.25
     }, {
       quantity: 1,
       side: "SELL",
-      tradingpair: "BNBUSDT"
+      symbol: "BNBUSDT"
     }]);
   });
 
@@ -180,7 +182,7 @@ describe("Portfolio Manager with simplified prices", () => {
     // trading via USDT
     // start state= one holding
 
-    const myManager = new PortfolioManager({
+    const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
         BTCUSDT: 6000,
@@ -217,15 +219,15 @@ describe("Portfolio Manager with simplified prices", () => {
     }]);
 
     assert.sameDeepMembers(myManager.getOrders(), [{
-      tradingpair: "BTCUSDT",
+      symbol: "BTCUSDT",
       side: "SELL",
       quantity: 1
     }, {
-      tradingpair: "ETHUSDT",
+      symbol: "ETHUSDT",
       side: "BUY",
       quantity: 23.076923076923077
     }, {
-      tradingpair: "XRMUSDT",
+      symbol: "XRMUSDT",
       side: "BUY",
       quantity: 75
     }]);
@@ -235,7 +237,7 @@ describe("Portfolio Manager with simplified prices", () => {
     // asumptions:
     // trading via USDT
 
-    const myManager = new PortfolioManager({
+    const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
         BTCUSDT: 6000,
@@ -272,15 +274,15 @@ describe("Portfolio Manager with simplified prices", () => {
     }]);
 
     assert.sameDeepMembers(myManager.getOrders(), [{
-      tradingpair: "BTCUSDT",
+      symbol: "BTCUSDT",
       side: "SELL",
       quantity: 0.9825000003575
     }, {
-      tradingpair: "USDTETH",
+      symbol: "USDTETH",
       side: "BUY",
       quantity: 394.9999956450001
     }, {
-      tradingpair: "USDTXRM",
+      symbol: "USDTXRM",
       side: "SELL",
       quantity: 6289.999997790001
     }]);
@@ -290,7 +292,7 @@ describe("Portfolio Manager with simplified prices", () => {
     // asumptions:
     // trading via USDT
 
-    const myManager = new PortfolioManager({
+    const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
         USDTBTC: 0.0001666666,
@@ -327,15 +329,15 @@ describe("Portfolio Manager with simplified prices", () => {
     }]);
 
     assert.sameDeepMembers(myManager.getOrders(), [{
-      tradingpair: "USDTBTC",
+      symbol: "USDTBTC",
       side: "BUY",
       quantity: 5895.003216001286
     }, {
-      tradingpair: "ETHUSDT",
+      symbol: "ETHUSDT",
       side: "SELL",
       quantity: 3.0384493538412802
     }, {
-      tradingpair: "XRMUSDT",
+      symbol: "XRMUSDT",
       side: "BUY",
       quantity: 157.25004080001634
     }]);
@@ -346,7 +348,7 @@ describe("Portfolio Manager with simplified prices", () => {
     // asumptions:
     // trading via USDT
 
-    const myManager = new PortfolioManager({
+    const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
         BTCUSDT: 6000,
@@ -396,7 +398,7 @@ describe("Portfolio Manager with realistic prices", () => {
     // asumptions:
     // trading via USDT
 
-    const myManager = new PortfolioManager({
+    const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
         STEEMUSDT: "0.176360", // till here fakes
@@ -511,7 +513,7 @@ describe("Portfolio Manager with realistic prices", () => {
     // asumptions:
     // trading via USDT
 
-    const myManager = new PortfolioManager({
+    const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
         STEEMUSDT: "0.176360",
@@ -620,47 +622,47 @@ describe("Portfolio Manager with realistic prices", () => {
     }]);
 
     assert.sameDeepMembers(myManager.getOrders(), [{
-      tradingpair: "ETHUSDT",
+      symbol: "ETHUSDT",
       side: "BUY",
       quantity: 12.633793329777358
     }, {
-      tradingpair: "XRPUSDT",
+      symbol: "XRPUSDT",
       side: "BUY",
       quantity: 8653.637510621953
     }, {
-      tradingpair: "BTCUSDT",
+      symbol: "BTCUSDT",
       side: "SELL",
       quantity: 0.7740940291673134
     }, {
-      tradingpair: "BCHUSDT",
+      symbol: "BCHUSDT",
       side: "BUY",
       quantity: 6.4088468079562295
     }, {
-      tradingpair: "LTCUSDT",
+      symbol: "LTCUSDT",
       side: "BUY",
       quantity: 29.52092785824914
     }, {
-      tradingpair: "EOSUSDT",
+      symbol: "EOSUSDT",
       side: "BUY",
       quantity: 423.7381222282562
     }, {
-      tradingpair: "BNBUSDT",
+      symbol: "BNBUSDT",
       side: "SELL",
       quantity: 177.3401038158958
     }, {
-      tradingpair: "XTZUSDT",
+      symbol: "XTZUSDT",
       side: "BUY",
       quantity: 315.3159484229316
     }, {
-      tradingpair: "XMRUSDT",
+      symbol: "XMRUSDT",
       side: "BUY",
       quantity: 8.015261136245996
     }, {
-      tradingpair: "XLMUSDT",
+      symbol: "XLMUSDT",
       side: "BUY",
       quantity: 9071.407387469388
     }, {
-      tradingpair: "STEEMUSDT",
+      symbol: "STEEMUSDT",
       side: "SELL",
       quantity: 4589.53
     }]);
@@ -670,7 +672,7 @@ describe("Portfolio Manager with realistic prices", () => {
     // asumptions:
     // trading via BNB
 
-    const myManager = new PortfolioManager({
+    const myManager = new PortfolioManager(); myManager.init({
       test: true,
       baseCurrency: "BNB",
       prices: {
@@ -779,43 +781,43 @@ describe("Portfolio Manager with realistic prices", () => {
     }]);
 
     assert.sameDeepMembers(myManager.getOrders(), [{
-      tradingpair: "BNBETH",
+      symbol: "BNBETH",
       side: "SELL",
       quantity: 132.63396226524227
     }, {
-      tradingpair: "XRPBNB",
+      symbol: "XRPBNB",
       side: "BUY",
       quantity: 8526.065688399993
     }, {
-      tradingpair: "BNBBTC",
+      symbol: "BNBBTC",
       side: "BUY",
       quantity: 401.72028893276763
     }, {
-      tradingpair: "BCHBNB",
+      symbol: "BCHBNB",
       side: "BUY",
       quantity: 6.154469523480914
     }, {
-      tradingpair: "LTCBNB",
+      symbol: "LTCBNB",
       side: "BUY",
       quantity: 28.607384762157434
     }, {
-      tradingpair: "EOSBNB",
+      symbol: "EOSBNB",
       side: "BUY",
       quantity: 407.79563631052207
     }, {
-      tradingpair: "XTZBNB",
+      symbol: "XTZBNB",
       side: "BUY",
       quantity: 305.84493363135726
     }, {
-      tradingpair: "XMRBNB",
+      symbol: "XMRBNB",
       side: "BUY",
       quantity: 7.985541622428839
     }, {
-      tradingpair: "XLMBNB",
+      symbol: "XLMBNB",
       side: "BUY",
       quantity: 8843.148465862736
     }, {
-      tradingpair: "STEEMBNB",
+      symbol: "STEEMBNB",
       side: "SELL",
       quantity: 4589.53
     }]);

@@ -70,23 +70,28 @@ describe("Portfolio Manager with unit prices", () => {
     assert.sameDeepMembers(myManager.getOrders(), [{
       symbol: "BNBUSDT",
       side: "BUY",
-      quantity: 1
+      quantity: 1,
+      type: "MARKET"
     }, {
       symbol: "BTCUSDT",
       side: "SELL",
-      quantity: 4
+      quantity: 4,
+      type: "MARKET"
     }, {
       symbol: "ETHUSDT",
       side: "BUY",
-      quantity: 1
+      quantity: 1,
+      type: "MARKET"
     }, {
       symbol: "TRXUSDT",
       side: "BUY",
-      quantity: 1
+      quantity: 1,
+      type: "MARKET"
     }, {
       symbol: "XRMUSDT",
       side: "BUY",
-      quantity: 1
+      quantity: 1,
+      type: "MARKET"
     }]);
 
   });
@@ -152,23 +157,28 @@ describe("Portfolio Manager with unit prices", () => {
     assert.sameDeepMembers(myManager.getOrders(), [{
       symbol: "BTCUSDT",
       side: "SELL",
-      quantity: 2.75
+      quantity: 2.75,
+      type: "MARKET"
     }, {
       symbol: "ETHUSDT",
       side: "BUY",
-      quantity: 1.25
+      quantity: 1.25,
+      type: "MARKET"
     }, {
       symbol: "TRXUSDT",
       side: "BUY",
-      quantity: 1.25
+      quantity: 1.25,
+      type: "MARKET"
     }, {
       symbol: "XRMUSDT",
       side: "BUY",
-      quantity: 1.25
+      quantity: 1.25,
+      type: "MARKET"
     }, {
       quantity: 1,
       side: "SELL",
-      symbol: "BNBUSDT"
+      symbol: "BNBUSDT",
+      type: "MARKET"
     }]);
   });
 
@@ -221,15 +231,18 @@ describe("Portfolio Manager with simplified prices", () => {
     assert.sameDeepMembers(myManager.getOrders(), [{
       symbol: "BTCUSDT",
       side: "SELL",
-      quantity: 1
+      quantity: 1,
+      type: "MARKET"
     }, {
       symbol: "ETHUSDT",
       side: "BUY",
-      quantity: 23.076923076923077
+      quantity: 23.076923076923077,
+      type: "MARKET"
     }, {
       symbol: "XRMUSDT",
       side: "BUY",
-      quantity: 75
+      quantity: 75,
+      type: "MARKET"
     }]);
   });
 
@@ -276,15 +289,18 @@ describe("Portfolio Manager with simplified prices", () => {
     assert.sameDeepMembers(myManager.getOrders(), [{
       symbol: "BTCUSDT",
       side: "SELL",
-      quantity: 0.9825000003575
+      quantity: 0.9825000003575,
+      type: "MARKET"
     }, {
       symbol: "USDTETH",
       side: "BUY",
-      quantity: 394.9999956450001
+      quantity: 394.9999956450001,
+      type: "MARKET"
     }, {
       symbol: "USDTXRM",
       side: "SELL",
-      quantity: 6289.999997790001
+      quantity: 6289.999997790001,
+      type: "MARKET"
     }]);
   });
 
@@ -331,15 +347,18 @@ describe("Portfolio Manager with simplified prices", () => {
     assert.sameDeepMembers(myManager.getOrders(), [{
       symbol: "USDTBTC",
       side: "BUY",
-      quantity: 5895.003216001286
+      quantity: 5895.003216001286,
+      type: "MARKET"
     }, {
       symbol: "ETHUSDT",
       side: "SELL",
-      quantity: 3.0384493538412802
+      quantity: 3.0384493538412802,
+      type: "MARKET"
     }, {
       symbol: "XRMUSDT",
       side: "BUY",
-      quantity: 157.25004080001634
+      quantity: 157.25004080001634,
+      type: "MARKET"
     }]);
 
   });
@@ -624,47 +643,58 @@ describe("Portfolio Manager with realistic prices", () => {
     assert.sameDeepMembers(myManager.getOrders(), [{
       symbol: "ETHUSDT",
       side: "BUY",
-      quantity: 12.633793329777358
+      quantity: 12.633793329777358,
+      type: "MARKET"
     }, {
       symbol: "XRPUSDT",
       side: "BUY",
-      quantity: 8653.637510621953
+      quantity: 8653.637510621953,
+      type: "MARKET"
     }, {
       symbol: "BTCUSDT",
       side: "SELL",
-      quantity: 0.7740940291673134
+      quantity: 0.7740940291673134,
+      type: "MARKET"
     }, {
       symbol: "BCHUSDT",
       side: "BUY",
-      quantity: 6.4088468079562295
+      quantity: 6.4088468079562295,
+      type: "MARKET"
     }, {
       symbol: "LTCUSDT",
       side: "BUY",
-      quantity: 29.52092785824914
+      quantity: 29.52092785824914,
+      type: "MARKET"
     }, {
       symbol: "EOSUSDT",
       side: "BUY",
-      quantity: 423.7381222282562
+      quantity: 423.7381222282562,
+      type: "MARKET"
     }, {
       symbol: "BNBUSDT",
       side: "SELL",
-      quantity: 177.3401038158958
+      quantity: 177.3401038158958,
+      type: "MARKET"
     }, {
       symbol: "XTZUSDT",
       side: "BUY",
-      quantity: 315.3159484229316
+      quantity: 315.3159484229316,
+      type: "MARKET"
     }, {
       symbol: "XMRUSDT",
       side: "BUY",
-      quantity: 8.015261136245996
+      quantity: 8.015261136245996,
+      type: "MARKET"
     }, {
       symbol: "XLMUSDT",
       side: "BUY",
-      quantity: 9071.407387469388
+      quantity: 9071.407387469388,
+      type: "MARKET"
     }, {
       symbol: "STEEMUSDT",
       side: "SELL",
-      quantity: 4589.53
+      quantity: 4589.53,
+      type: "MARKET"
     }]);
   });
 
@@ -783,43 +813,53 @@ describe("Portfolio Manager with realistic prices", () => {
     assert.sameDeepMembers(myManager.getOrders(), [{
       symbol: "BNBETH",
       side: "SELL",
-      quantity: 132.63396226524227
+      quantity: 132.63396226524227,
+      type: "MARKET"
     }, {
       symbol: "XRPBNB",
       side: "BUY",
-      quantity: 8526.065688399993
+      quantity: 8526.065688399993,
+      type: "MARKET"
     }, {
       symbol: "BNBBTC",
       side: "BUY",
-      quantity: 401.72028893276763
+      quantity: 401.72028893276763,
+      type: "MARKET"
     }, {
       symbol: "BCHBNB",
       side: "BUY",
-      quantity: 6.154469523480914
+      quantity: 6.154469523480914,
+      type: "MARKET"
     }, {
       symbol: "LTCBNB",
       side: "BUY",
-      quantity: 28.607384762157434
+      quantity: 28.607384762157434,
+      type: "MARKET"
     }, {
       symbol: "EOSBNB",
       side: "BUY",
-      quantity: 407.79563631052207
+      quantity: 407.79563631052207,
+      type: "MARKET"
     }, {
       symbol: "XTZBNB",
       side: "BUY",
-      quantity: 305.84493363135726
+      quantity: 305.84493363135726,
+      type: "MARKET"
     }, {
       symbol: "XMRBNB",
       side: "BUY",
-      quantity: 7.985541622428839
+      quantity: 7.985541622428839,
+      type: "MARKET"
     }, {
       symbol: "XLMBNB",
       side: "BUY",
-      quantity: 8843.148465862736
+      quantity: 8843.148465862736,
+      type: "MARKET"
     }, {
       symbol: "STEEMBNB",
       side: "SELL",
-      quantity: 4589.53
+      quantity: 4589.53,
+      type: "MARKET"
     }]);
   });
 

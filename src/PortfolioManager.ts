@@ -4,6 +4,7 @@ interface Order {
   symbol: string;
   side: string;
   quantity: number;
+  type: string;
 }
 
 interface TargetAsset {
@@ -217,7 +218,14 @@ export class PortfolioManager {
       }
       throw new Error(`Cannot find matching trading pair for ${buyPair} / ${sellPair}.`);
     });
-    return orders.filter((o) => o.quantity !== 0);
+    return orders.filter((o) => {
+      if (o.quantity === 0) {
+        console.log(o);
+        return false;
+      }
+      return true;
+    }
+    );
   }
 
   async sendOrders() {

@@ -8,50 +8,70 @@ async function perform() {
   await myManager.init({
     binanceSecret: process.env.BINANCE_SECRET,
     binanceKey: process.env.BINANCE_KEY,
-    baseCurrency: "BNB",
-    ignoreCoins: ["HIVE"]
+    baseCurrency: "BUSD",
+    ignoreCoins: ["HIVE", "STEEM"]
   });
 
   myManager.setGoalState([{
     asset: "ETH",
     name: "Ethereum",
-    ratio: 0.162
+    ratio: 0.145
   }, {
     asset: "XRP",
     name: "Ripple",
-    ratio: 0.151
+    ratio: 0.116
   }, {
     asset: "BTC",
     name: "Bitcoin",
-    ratio: 0.14
+    ratio: 0.115
   }, {
     asset: "BCH",
     name: "Bitcoin Cash ABC",
-    ratio: 0.134
+    ratio: 0.116
   }, {
     asset: "LTC",
     name: "Litecoin",
-    ratio: 0.113
+    ratio: 0.097
   }, {
     asset: "EOS",
     name: "EOS",
-    ratio: 0.091
+    ratio: 0.081
   }, {
     asset: "BNB",
     name: "Binance",
-    ratio: 0.085
+    ratio: 0.093
   }, {
     asset: "XTZ",
     name: "Tezos",
-    ratio: 0.049
-  }, {
-    asset: "XMR",
-    name: "Monero",
-    ratio: 0.038
+    ratio: 0.056
+    // }, {
+    //     asset: "LINK",
+    //     name: "Chainlink",
+    //     ratio: 0.036
   }, {
     asset: "XLM",
     name: "Stellar",
-    ratio: 0.036
+    ratio: 0.033
+  }, {
+    asset: "XMR",
+    name: "Monero",
+    ratio: 0.033
+  }, {
+    asset: "ADA",
+    name: "Cardano",
+    ratio: 0.029
+  }, {
+    asset: "TRX",
+    name: "Tron",
+    ratio: 0.029
+  }, {
+    asset: "DASH",
+    name: "Dashcoin",
+    ratio: 0.025
+  }, {
+    asset: "NEO",
+    name: "Neo",
+    ratio: 0.018
   }]);
 
   console.log(myManager.getOrders());

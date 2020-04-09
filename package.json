@@ -1,8 +1,9 @@
 {
   "name": "binance-portfolio",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Sync your portofolio automatically",
-  "main": "index.js",
+  "main": "dist/src/PortfolioManager.js",
+  "types": "dist/src/PortfolioManager.d.ts",
   "license": "MIT",
   "scripts": {
     "build": "tsc",

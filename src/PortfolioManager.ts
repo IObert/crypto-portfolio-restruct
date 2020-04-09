@@ -115,7 +115,7 @@ export class PortfolioManager {
 
 
 
-  private roundAmount(symbol: string, amount: number, func: Function): number {
+  private roundAmount(symbol: string, amount: number): number {
     if (!this.client) { //TODO add test data for rounding, remove this when ready
       return amount;
     }
@@ -128,15 +128,17 @@ export class PortfolioManager {
     // @ts-ignore
     const lotFilter = oInfo.filters.find((oFilter) => oFilter.filterType === "LOT_SIZE");
     // @ts-ignore
-    const dec = 1 / +lotFilter.stepSize;
+    const log10 = Math.log10(+lotFilter.stepSize);
 
     // @ts-ignore
     const minFilter = oInfo.filters.find((oFilter) => oFilter.filterType === "MIN_NOTIONAL");
     // @ts-ignore
     const min = +minFilter.minNotional;
 
-    const candidate = func(amount * dec) / dec;
-    return candidate > min ? candidate : 0
+
+    const candidate = +amount.toFixed(-log10);
+    // return candidate;
+    return candidate > min ? candidate : 0;
   }
 
   getOrders(): Order[] {
@@ -186,7 +188,7 @@ export class PortfolioManager {
             symbol: buyPair,
             side: "BUY",
             type: "MARKET",
-            quantity: this.roundAmount(buyPair, targetBalanceItem.delta / buyConvertionRate, Math.floor)
+            quantity: this.roundAmount(buyPair, targetBalanceItem.delta / buyConvertionRate)
           };
         }
         if (targetBalanceItem.delta < 0) {
@@ -194,7 +196,7 @@ export class PortfolioManager {
             symbol: buyPair,
             side: "SELL",
             type: "MARKET",
-            quantity: this.roundAmount(buyPair, -targetBalanceItem.delta / buyConvertionRate, Math.ceil)
+            quantity: this.roundAmount(buyPair, -targetBalanceItem.delta / buyConvertionRate)
           };
         }
       }
@@ -204,7 +206,7 @@ export class PortfolioManager {
             symbol: sellPair,
             side: "SELL",
             type: "MARKET",
-            quantity: this.roundAmount(sellPair, targetBalanceItem.delta, Math.ceil)
+            quantity: this.roundAmount(sellPair, targetBalanceItem.delta)
           };
         }
         if (targetBalanceItem.delta < 0) {
@@ -212,15 +214,15 @@ export class PortfolioManager {
             symbol: sellPair,
             side: "BUY",
             type: "MARKET",
-            quantity: this.roundAmount(sellPair, -targetBalanceItem.delta, Math.floor)
+            quantity: this.roundAmount(sellPair, -targetBalanceItem.delta)
           };
         }
       }
       throw new Error(`Cannot find matching trading pair for ${buyPair} / ${sellPair}.`);
     });
     return orders.filter((o) => {
-      if (o.quantity === 0) {
-        console.log(o);
+      if (o.quantity < 1) {
+        // console.log(o);
         return false;
       }
       return true;
@@ -234,7 +236,7 @@ export class PortfolioManager {
     }
 
     // @ts-ignore
-    this.getOrders().map(this.client.orderTest);
+    this.getOrders().map(this.client.order);
   }
 
   async testOrders() {

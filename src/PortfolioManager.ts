@@ -24,6 +24,12 @@ interface Configuration {
   test?: boolean;
 }
 
+interface RatioAsset {
+  asset: string;
+  string: string;
+  ratio: number;
+}
+
 export class PortfolioManager {
   client?: Binance;
   prices: any;
@@ -141,17 +147,46 @@ export class PortfolioManager {
     return candidate > min ? candidate : 0;
   }
 
-  getOrders(): Order[] {
-    if (!this.initialized) {
-      throw new Error("Instance was never initialized.");
-    }
-    const sumOfCurrentAssets = this.balances.reduce((sum: number, balanceItem: AssetBalance) => {
+  printPortfolio(precision: number = 2): string {
+    const sumOfCurrentAssets = this.getPortfolioValue();
+
+    const aRatioBalances: RatioAsset[] = [];
+    let summary = `The value of your portfolio is: ${this.baseCurrency} ${sumOfCurrentAssets} \n`;
+
+    this.balances.forEach((balanceItem: AssetBalance) => {
+      const amount = +balanceItem.free;
+      if (amount !== 0) {
+        const ratio = amount * this.getConvertionRate(balanceItem.asset, this.baseCurrency) / sumOfCurrentAssets * 100;
+        aRatioBalances.push({
+          asset: balanceItem.asset,
+          ratio: ratio,
+          string: `${balanceItem.asset}: ${ratio.toFixed(precision)}%`
+        });
+      }
+    });
+
+    aRatioBalances.sort((a, b) => b.ratio - a.ratio);
+    aRatioBalances.forEach(oRatioBalance => summary += oRatioBalance.string + `\n`);
+
+    console.log(summary);
+    return summary;
+  }
+
+  getPortfolioValue(): number {
+    return this.balances.reduce((sum: number, balanceItem: AssetBalance) => {
       const amount = +balanceItem.free;
       if (amount === 0) {
         return sum;
       }
       return amount * this.getConvertionRate(balanceItem.asset, this.baseCurrency) + sum;
     }, 0);
+  }
+
+  getOrders(): Order[] {
+    if (!this.initialized) {
+      throw new Error("Instance was never initialized.");
+    }
+    const sumOfCurrentAssets = this.getPortfolioValue();
 
     this.targetBalances.forEach((targetBalanceItem) => {
 

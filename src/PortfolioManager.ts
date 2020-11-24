@@ -119,8 +119,6 @@ export class PortfolioManager {
     throw new Error(`Missing convertion rate: ${asset1}${asset2} / ${asset2}${asset1}`);
   }
 
-
-
   private roundAmount(symbol: string, amount: number): number {
     if (!this.client) { //TODO add test data for rounding, remove this when ready
       return amount;
@@ -257,7 +255,6 @@ export class PortfolioManager {
     });
     return orders.filter((o) => {
       if (o.quantity < 1) {
-        // console.log(o);
         return false;
       }
       return true;

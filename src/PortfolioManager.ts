@@ -172,7 +172,7 @@ export class PortfolioManager {
     }
 
     return {
-      sum: { asset: this.fiatCurrency || this.baseCurrency, value: sumOfCurrentAssets },
+      sum: { asset: this.fiatCurrency || this.baseCurrency, amount: sumOfCurrentAssets },
       portfolio: aRatioBalances
     };
   }

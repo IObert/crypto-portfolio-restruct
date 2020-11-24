@@ -18,6 +18,7 @@ interface Configuration {
   binanceKey?: string;
   binanceSecret?: string;
   baseCurrency?: string;
+  fiatCurrency?: string;
   prices?: any;
   balances?: AssetBalance[];
   ignoreCoins?: string[];
@@ -37,6 +38,7 @@ export class PortfolioManager {
   balances: AssetBalance[] = [];
   symbols: import("binance-api-node").Symbol[] = [];
   baseCurrency: string = "USDT";
+  fiatCurrency?: string;
   targetBalances: TargetAsset[] = [];
 
   // TODO write readme
@@ -45,6 +47,7 @@ export class PortfolioManager {
   async init(config: Configuration): Promise<any> {
 
     this.baseCurrency = config.baseCurrency || this.baseCurrency;
+    this.fiatCurrency = config.fiatCurrency;
     const ignoreCoins = config.ignoreCoins || [];
 
     return new Promise(async (resolve) => {
@@ -70,7 +73,7 @@ export class PortfolioManager {
       this.balances = this.balances.filter(oBalanceItem => !ignoreCoins.includes(oBalanceItem.asset));
 
       this.initialized = true;
-      resolve();
+      resolve({});
     });
   }
 
@@ -145,11 +148,10 @@ export class PortfolioManager {
     return candidate > min ? candidate : 0;
   }
 
-  printPortfolio(precision: number = 2): string {
-    const sumOfCurrentAssets = this.getPortfolioValue();
+  getPortfolio(precision: number = 2): any {
+    let sumOfCurrentAssets = this.getPortfolioValue();
 
     const aRatioBalances: RatioAsset[] = [];
-    let summary = `The value of your portfolio is: ${this.baseCurrency} ${sumOfCurrentAssets} \n`;
 
     this.balances.forEach((balanceItem: AssetBalance) => {
       const amount = +balanceItem.free;
@@ -164,10 +166,15 @@ export class PortfolioManager {
     });
 
     aRatioBalances.sort((a, b) => b.ratio - a.ratio);
-    aRatioBalances.forEach(oRatioBalance => summary += oRatioBalance.string + `\n`);
 
-    console.log(summary);
-    return summary;
+    if (this.fiatCurrency) {
+      sumOfCurrentAssets = sumOfCurrentAssets * this.getConvertionRate(this.baseCurrency, this.fiatCurrency);
+    }
+
+    return {
+      sum: { asset: this.fiatCurrency || this.baseCurrency, value: sumOfCurrentAssets },
+      portfolio: aRatioBalances
+    };
   }
 
   getPortfolioValue(): number {

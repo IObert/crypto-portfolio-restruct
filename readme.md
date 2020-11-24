@@ -1,6 +1,6 @@
 # Binance Portfolio Restructuring Tool
 
-A simple tool to get an overview of your current portfolio mix and to calculate (and perform) trades to restructure your portfolio.
+A simple tool to get an overview of your current crypto portfolio  and to calculate (and perform) trades to restructure your portfolio.
 
 ```
 const { PortfolioManager } = require('binance-portfolioo-restruct');
@@ -51,6 +51,7 @@ await myManager.init({
     binanceSecret: process.env.BINANCE_SECRET,
     binanceKey: process.env.BINANCE_KEY,
     baseCurrency: "BNB",
+    fiatCurrency: "EUR",
     ignoreCoins: ["GAS", "BCHA"]
 });
 ```
@@ -59,7 +60,8 @@ Parameters:
 - binanceSecret: The Binance [API key](https://www.binance.com/en/support/faq/360002502072-How-to-create-API) secret
 - binanceKey: The Binance [API key](https://www.binance.com/en/support/faq/360002502072-How-to-create-API)
 - baseCurrency: The portfolio manager will calculate the portfolio sum in this token. It also tries to convert all other currencies in this token before it will be traded into the target currency.
-- ignoreCoins: Array of symbols which shall be ignored. This field can be used to avoid errors due to missing trading pairs.
+- ? fiatCurrency: Will only be used to display the portfolio value in the summary
+- ? ignoreCoins: Array of symbols which shall be ignored. This field can be used to avoid errors due to missing trading pairs.
 
 > For testing purposes, you can add `test: true` to the config and pass in `prices` and `balances` as well.
 
@@ -82,7 +84,7 @@ myManager.setGoalState([{
 Parameters:
 - asset: Specify the currency symbol
 - ratio: The percentage of the desired state (0.7 = 70%)
-- name: Name of the curreny [optional]
+- ? name: Name of the curreny
 
 
 ### `getOrders`

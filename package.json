@@ -8,6 +8,16 @@
   "main": "dist/src/PortfolioManager.js",
   "types": "dist/src/PortfolioManager.d.ts",
   "license": "MIT",
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IObert/crypto-portfolio-restruct.git"
+  },
+
+  "bugs": {
+    "url": "https://github.com/IObert/crypto-portfolio-restruct"
+  },
+  "homepage": "https://github.com/IObert/crypto-portfolio-restruct#readme",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",

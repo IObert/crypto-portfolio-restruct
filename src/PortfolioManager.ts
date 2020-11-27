@@ -260,13 +260,14 @@ export class PortfolioManager {
       }
       throw new Error(`Cannot find matching trading pair for ${buyPair} / ${sellPair}.`);
     });
-    return orders.filter((o) => {
-      if (o.quantity < 1) {
-        return false;
-      }
-      return true;
-    }
-    );
+    return orders;
+    // return orders.filter((o) => {
+    //   if (o.quantity < 1) {
+    //     return false;
+    //   }
+    //   return true;
+    // }
+    // );
   }
 
   async sendOrders() {

@@ -1,6 +1,6 @@
-# Binance Portfolio Restructuring Tool
+# Binance Asset Allocation Tool
 
-A simple tool to get an overview of your current crypto portfolio  and to calculate (and perform) trades to restructure your portfolio.
+A simple tool to get an overview of your current crypto portfolio  and to calculate (and perform) trades to reallocate your assets.
 
 ```
 const { PortfolioManager } = require('binance-portfolioo-restruct');

@@ -1,3 +1,5 @@
+![](https://github.com/IObert/crypto-portfolio-restruct/workflows/Run%20Tests/badge.svg)
+
 # Binance Asset Allocation Tool
 
 A simple tool to get an overview of your current crypto portfolio  and to calculate (and perform) trades to reallocate your assets.

@@ -1,6 +1,6 @@
 {
   "name": "crypto-portfolio-restruct",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Sync your portofolio automatically",
   "files": [
     "dist"
@@ -8,12 +8,10 @@
   "main": "dist/src/PortfolioManager.js",
   "types": "dist/src/PortfolioManager.d.ts",
   "license": "MIT",
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/IObert/crypto-portfolio-restruct.git"
   },
-
   "bugs": {
     "url": "https://github.com/IObert/crypto-portfolio-restruct"
   },

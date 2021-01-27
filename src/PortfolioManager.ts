@@ -28,6 +28,8 @@ interface Configuration {
 interface RatioAsset {
   asset: string;
   string: string;
+  base: number;
+  fiat?: number;
   ratio: number;
 }
 
@@ -61,8 +63,10 @@ export class PortfolioManager {
         }
         this.client = BinanceClient({
           apiKey: config.binanceKey,
-          apiSecret: config.binanceSecret
+          apiSecret: config.binanceSecret,
+          useServerTime: true,
         });
+
         const accountInfo = await this.client.accountInfo();
         const exInfo = await this.client.exchangeInfo();
         this.prices = await this.client.prices();
@@ -156,9 +160,16 @@ export class PortfolioManager {
     this.balances.forEach((balanceItem: AssetBalance) => {
       const amount = +balanceItem.free;
       if (amount !== 0) {
-        const ratio = amount * this.getConvertionRate(balanceItem.asset, this.baseCurrency) / sumOfCurrentAssets * 100;
+        const base = amount * this.getConvertionRate(balanceItem.asset, this.baseCurrency);
+        let fiat;
+        if (this.fiatCurrency) {
+          fiat = base * this.getConvertionRate(this.baseCurrency, this.fiatCurrency);
+        }
+        const ratio = base / sumOfCurrentAssets * 100;
         aRatioBalances.push({
           asset: balanceItem.asset,
+          base,
+          fiat,
           ratio: ratio,
           string: `${balanceItem.asset}: ${ratio.toFixed(precision)}%`
         });

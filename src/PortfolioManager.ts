@@ -63,8 +63,7 @@ export class PortfolioManager {
         }
         this.client = BinanceClient({
           apiKey: config.binanceKey,
-          apiSecret: config.binanceSecret,
-          useServerTime: true,
+          apiSecret: config.binanceSecret
         });
 
         const accountInfo = await this.client.accountInfo();

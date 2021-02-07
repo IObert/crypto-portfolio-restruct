@@ -78,6 +78,7 @@ async function perform() {
 
   console.log(myManager.getPortfolio());
   // console.log(myManager.getOrders());
-  // myManager.testOrders();}
+  // myManager.testOrders();
+}
 
 perform();

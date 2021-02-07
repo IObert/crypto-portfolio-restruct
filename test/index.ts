@@ -76,8 +76,8 @@ async function perform() {
     ratio: 0.018
   }]);
 
-  console.log(myManager.getOrders());
-  myManager.testOrders();
-}
+  console.log(myManager.getPortfolio());
+  // console.log(myManager.getOrders());
+  // myManager.testOrders();}
 
 perform();

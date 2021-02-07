@@ -1,4 +1,5 @@
 import BinanceClient, { Binance, AssetBalance } from "binance-api-node";
+import SymbolMapper from "./SymbolMapper";
 
 interface Order {
   symbol: string;
@@ -110,6 +111,8 @@ export class PortfolioManager {
   }
 
   private getConvertionRate(asset1: string, asset2: string): number {
+    asset1 = SymbolMapper(asset1);
+    asset2 = SymbolMapper(asset2);
     const buyConvertionRate = this.prices[asset1 + asset2];
     const sellConvertionRate = this.prices[asset2 + asset1];
 

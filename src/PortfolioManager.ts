@@ -74,7 +74,10 @@ export class PortfolioManager {
         this.symbols = exInfo.symbols;
       }
 
-      this.balances = this.balances.filter(oBalanceItem => !ignoreCoins.includes(oBalanceItem.asset));
+      this.balances = this.balances.filter(oBalanceItem => {
+        oBalanceItem.asset = SymbolMapper(oBalanceItem.asset);
+        return !ignoreCoins.includes(oBalanceItem.asset)
+      });
 
       this.initialized = true;
       resolve({});
@@ -111,8 +114,6 @@ export class PortfolioManager {
   }
 
   private getConvertionRate(asset1: string, asset2: string): number {
-    asset1 = SymbolMapper(asset1);
-    asset2 = SymbolMapper(asset2);
     const buyConvertionRate = this.prices[asset1 + asset2];
     const sellConvertionRate = this.prices[asset2 + asset1];
 

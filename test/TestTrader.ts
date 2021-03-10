@@ -118,7 +118,7 @@ describe("Portfolio Manager with unit prices", () => {
         free: "4",
         locked: "0"
       }, {
-        asset: "BNB",
+        asset: "LDBNB",
         free: "1",
         locked: "0"
       }, {

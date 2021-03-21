@@ -1,4 +1,4 @@
-import BinanceClient, { Binance, AssetBalance } from "binance-api-node";
+import binanceApiNode, { Binance, AssetBalance } from "binance-api-node";
 import SymbolMapper from "./SymbolMapper";
 
 interface Order {
@@ -76,7 +76,7 @@ export class PortfolioManager {
 
       this.balances = this.balances.filter(oBalanceItem => {
         oBalanceItem.asset = SymbolMapper(oBalanceItem.asset);
-        return !ignoreCoins.includes(oBalanceItem.asset)
+        return !ignoreCoins.includes(oBalanceItem.asset);
       });
 
       this.initialized = true;
@@ -130,14 +130,13 @@ export class PortfolioManager {
   }
 
   private roundAmount(symbol: string, amount: number): number {
-    if (!this.client) { //TODO add test data for rounding, remove this when ready
+    if (!this.client) { // TODO add test data for rounding, remove this when ready
       return amount;
     }
     const oInfo = this.symbols.find(oS => oS.symbol === symbol);
     if (!oInfo || oInfo.status !== "TRADING") {
       throw new Error("Inactive trading pair: " + symbol);
     }
-
 
     // @ts-ignore
     const lotFilter = oInfo.filters.find((oFilter) => oFilter.filterType === "LOT_SIZE");
@@ -148,7 +147,6 @@ export class PortfolioManager {
     const minFilter = oInfo.filters.find((oFilter) => oFilter.filterType === "MIN_NOTIONAL");
     // @ts-ignore
     const min = +minFilter.minNotional;
-
 
     const candidate = +amount.toFixed(-log10);
     // return candidate;
@@ -169,13 +167,24 @@ export class PortfolioManager {
           fiat = base * this.getConvertionRate(this.baseCurrency, this.fiatCurrency);
         }
         const ratio = base / sumOfCurrentAssets * 100;
-        aRatioBalances.push({
-          asset: balanceItem.asset,
-          base,
-          fiat,
-          ratio: ratio,
-          string: `${balanceItem.asset}: ${ratio.toFixed(precision)}%`
-        });
+        const currentItem = aRatioBalances.find((o: any) => o.asset === balanceItem.asset);
+
+        if (currentItem) {
+          currentItem.base += base;
+          if (currentItem.fiat && fiat) {
+            currentItem.fiat += fiat;
+          }
+          currentItem.ratio += base;
+          currentItem.string = `${currentItem.asset}: ${currentItem.ratio.toFixed(precision)}%`;
+        } else {
+          aRatioBalances.push({
+            asset: balanceItem.asset,
+            base,
+            fiat,
+            ratio,
+            string: `${balanceItem.asset}: ${ratio.toFixed(precision)}%`
+          });
+        }
       }
     });
 

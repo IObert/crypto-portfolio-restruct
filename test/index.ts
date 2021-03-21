@@ -9,6 +9,7 @@ async function perform() {
     binanceSecret: process.env.BINANCE_SECRET,
     binanceKey: process.env.BINANCE_KEY,
     baseCurrency: "BTC",
+    fiatCurrency: "EUR",
     ignoreCoins: ["GAS",
       "BCHA",
       "WIN"]

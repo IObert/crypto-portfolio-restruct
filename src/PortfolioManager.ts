@@ -62,7 +62,7 @@ export class PortfolioManager {
         if (!config.binanceKey || !config.binanceSecret) {
           throw new Error("Missing credentials");
         }
-        this.client = BinanceClient({
+        this.client = binanceApiNode({
           apiKey: config.binanceKey,
           apiSecret: config.binanceSecret
         });
@@ -74,7 +74,7 @@ export class PortfolioManager {
         this.symbols = exInfo.symbols;
       }
 
-      this.balances = this.balances.filter(oBalanceItem => {
+      this.balances = this.balances.filter((oBalanceItem: any) => {
         oBalanceItem.asset = SymbolMapper(oBalanceItem.asset);
         return !ignoreCoins.includes(oBalanceItem.asset);
       });
@@ -99,7 +99,7 @@ export class PortfolioManager {
       throw new Error(`Ratios do not add up: ${Math.floor(total * 1000) / 1000}`);
     }
 
-    this.balances.forEach(oBalanceItem => {
+    this.balances.forEach((oBalanceItem: any) => {
       if (!targetAssets.includes(oBalanceItem.asset)) {
         const amount = +oBalanceItem.free;
         if (amount === 0) {
@@ -135,16 +135,16 @@ export class PortfolioManager {
     }
     const oInfo = this.symbols.find(oS => oS.symbol === symbol);
     if (!oInfo || oInfo.status !== "TRADING") {
-      throw new Error("Inactive trading pair: " + symbol);
+      throw new Error(`Inactive trading pair: ${symbol}`);
     }
 
     // @ts-ignore
-    const lotFilter = oInfo.filters.find((oFilter) => oFilter.filterType === "LOT_SIZE");
+    const lotFilter = oInfo.filters.find((oFilter: any) => oFilter.filterType === "LOT_SIZE");
     // @ts-ignore
     const log10 = Math.log10(+lotFilter.stepSize);
 
     // @ts-ignore
-    const minFilter = oInfo.filters.find((oFilter) => oFilter.filterType === "MIN_NOTIONAL");
+    const minFilter = oInfo.filters.find((oFilter: any) => oFilter.filterType === "MIN_NOTIONAL");
     // @ts-ignore
     const min = +minFilter.minNotional;
 
@@ -178,10 +178,10 @@ export class PortfolioManager {
           currentItem.string = `${currentItem.asset}: ${currentItem.ratio.toFixed(precision)}%`;
         } else {
           aRatioBalances.push({
-            asset: balanceItem.asset,
             base,
             fiat,
             ratio,
+            asset: balanceItem.asset,
             string: `${balanceItem.asset}: ${ratio.toFixed(precision)}%`
           });
         }
@@ -234,7 +234,7 @@ export class PortfolioManager {
       (targetBalanceItem.delta !== 0) &&
       (targetBalanceItem.asset !== this.baseCurrency));
 
-    const orders = this.targetBalances.map(targetBalanceItem => {
+    const orders = this.targetBalances.map((targetBalanceItem: TargetAsset) => {
 
       const buyPair = `${targetBalanceItem.asset}${this.baseCurrency}`;
       const buyConvertionRate = this.prices[buyPair];

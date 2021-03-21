@@ -15,7 +15,8 @@
       130
     ],
     "no-suspicious-comment": 1,
-    "align": 0
+    "align": 0,
+    "function-name": 0
   },
   "rulesDirectory": []
 }

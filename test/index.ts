@@ -10,9 +10,12 @@ async function perform() {
     binanceKey: process.env.BINANCE_KEY,
     baseCurrency: "BTC",
     fiatCurrency: "EUR",
-    ignoreCoins: ["GAS",
+    ignoreCoins: [
+      "GAS",
       "BCHA",
-      "WIN"]
+      "WIN",
+      "TLM"
+    ]
   });
 
   myManager.setGoalState([{

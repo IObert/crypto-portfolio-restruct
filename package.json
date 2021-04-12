@@ -1,6 +1,6 @@
 {
   "name": "crypto-portfolio-restruct",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Sync your portofolio automatically",
   "files": [
     "dist"

@@ -8,14 +8,8 @@ async function perform() {
   await myManager.init({
     binanceSecret: process.env.BINANCE_SECRET,
     binanceKey: process.env.BINANCE_KEY,
-    baseCurrency: "BTC",
-    fiatCurrency: "EUR",
-    ignoreCoins: [
-      "GAS",
-      "BCHA",
-      "WIN",
-      "TLM"
-    ]
+    baseCurrency: "EUR",
+    fiatCurrency: "EUR" 
   });
 
   myManager.setGoalState([{

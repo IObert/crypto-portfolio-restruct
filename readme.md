@@ -119,7 +119,6 @@ myManager.testOrders()
 ## Known Issues
 
 - Sometimes the `sendOrders` method needs to be called multiple times (needs to be fixed)
-- The calculated trades are determinded by a greedy approach and have room for optimization
 - Currently only works with Binance exchange
 - A lot of room for improvement :)
 

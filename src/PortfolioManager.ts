@@ -1,4 +1,8 @@
 import binanceApiNode, { Binance, AssetBalance, Symbol } from "binance-api-node";
+import { assert } from "chai";
+//@ts-ignore
+import { single_source_shortest_paths } from "dijkstrajs";
+
 import SymbolMapper from "./SymbolMapper";
 
 interface Order {
@@ -21,6 +25,7 @@ interface Configuration {
   baseCurrency?: string;
   fiatCurrency?: string;
   prices?: any;
+  graph?: any;
   balances?: AssetBalance[];
   ignoreCoins?: string[];
   test?: boolean;
@@ -41,6 +46,7 @@ export class PortfolioManager {
   balances: AssetBalance[] = [];
   symbols: import("binance-api-node").Symbol[] = [];
   baseCurrency: string = "USDT";
+  graph: any;
   fiatCurrency?: string;
   targetBalances: TargetAsset[] = [];
 
@@ -55,9 +61,10 @@ export class PortfolioManager {
 
     if (config.test) {
       this.prices = config.prices;
+      this.graph = config.graph;
       this.balances = config.balances || [];
       this.initialized = true;
-    } 
+    }
 
     return new Promise(async (resolve) => {
 
@@ -75,19 +82,35 @@ export class PortfolioManager {
         this.prices = await this.client.prices();
         this.balances = accountInfo.balances;
         this.symbols = exInfo.symbols;
+        this.graph = {};
+
+        const assets = new Set<string>();
+        this.symbols.forEach((symbol: Symbol) => {
+          //build up assets
+          assets.add(symbol.baseAsset);
+          assets.add(symbol.quoteAsset);
+
+          if (symbol.status === "TRADING") {
+            //build up graph
+            if (!this.graph[symbol.baseAsset]) {
+              this.graph[symbol.baseAsset] = {};
+            }
+            this.graph[symbol.baseAsset][symbol.quoteAsset] = 1;
+
+
+            if (!this.graph[symbol.quoteAsset]) {
+              this.graph[symbol.quoteAsset] = {};
+            }
+            this.graph[symbol.quoteAsset][symbol.baseAsset] = 1;
+          }
+        });
+        this.balances = this.balances.filter((oBalanceItem: any) => {
+          oBalanceItem.asset = SymbolMapper(oBalanceItem.asset, assets);
+          return !ignoreCoins.includes(oBalanceItem.asset);
+        });
+
+        this.initialized = true;
       }
-
-      const assets = new Set<string>();
-      this.symbols.forEach((symbol: Symbol) => {
-        assets.add(symbol.baseAsset);
-        assets.add(symbol.quoteAsset);
-      });
-      this.balances = this.balances.filter((oBalanceItem: any) => {
-        oBalanceItem.asset = SymbolMapper(oBalanceItem.asset, assets);
-        return !ignoreCoins.includes(oBalanceItem.asset);
-      });
-
-      this.initialized = true;
       resolve({});
     });
   }
@@ -121,6 +144,23 @@ export class PortfolioManager {
     });
   }
 
+  private getVirtualConvertionRate(asset1: string, asset2: string): number {
+    if (asset1 === asset2) {
+      return 1;
+    }
+
+    const path = single_source_shortest_paths(this.graph, asset1, asset2);
+    let rate = 1;
+    let intermed = asset2;
+    do {
+      asset2 = intermed;
+      intermed = path[intermed];
+      rate *= this.getConvertionRate(intermed, asset2);
+    } while (intermed !== asset1 && intermed);
+
+    return rate;
+  }
+
   private getConvertionRate(asset1: string, asset2: string): number {
     const buyConvertionRate = this.prices[asset1 + asset2];
     const sellConvertionRate = this.prices[asset2 + asset1];
@@ -130,9 +170,6 @@ export class PortfolioManager {
     }
     if (sellConvertionRate) {
       return 1 / +sellConvertionRate;
-    }
-    if (asset1 === asset2) {
-      return 1;
     }
     throw new Error(`Missing convertion rate: ${asset1}${asset2} / ${asset2}${asset1}`);
   }
@@ -169,10 +206,10 @@ export class PortfolioManager {
     this.balances.forEach((balanceItem: AssetBalance) => {
       const amount = +balanceItem.free;
       if (amount !== 0) {
-        const base = amount * this.getConvertionRate(balanceItem.asset, this.baseCurrency);
+        const base = amount * this.getVirtualConvertionRate(balanceItem.asset, this.baseCurrency);
         let fiat;
         if (this.fiatCurrency) {
-          fiat = base * this.getConvertionRate(this.baseCurrency, this.fiatCurrency);
+          fiat = base * this.getVirtualConvertionRate(this.baseCurrency, this.fiatCurrency);
         }
         const ratio = base / sumOfCurrentAssets * 100;
         const currentItem = aRatioBalances.find((o: any) => o.asset === balanceItem.asset);
@@ -199,7 +236,7 @@ export class PortfolioManager {
     aRatioBalances.sort((a, b) => b.ratio - a.ratio);
 
     if (this.fiatCurrency) {
-      sumOfCurrentAssets = sumOfCurrentAssets * this.getConvertionRate(this.baseCurrency, this.fiatCurrency);
+      sumOfCurrentAssets = sumOfCurrentAssets * this.getVirtualConvertionRate(this.baseCurrency, this.fiatCurrency);
     }
 
     return {
@@ -214,7 +251,7 @@ export class PortfolioManager {
       if (amount === 0) {
         return sum;
       }
-      return amount * this.getConvertionRate(balanceItem.asset, this.baseCurrency) + sum;
+      return amount * this.getVirtualConvertionRate(balanceItem.asset, this.baseCurrency) + sum;
     }, 0);
   }
 
@@ -233,7 +270,7 @@ export class PortfolioManager {
         throw new Error(`Asset missing in current balance: ${targetBalanceItem.asset}`);
       }
 
-      const currentAmountInBaseCurrency = +owning.free * this.getConvertionRate(targetBalanceItem.asset, this.baseCurrency);
+      const currentAmountInBaseCurrency = +owning.free * this.getVirtualConvertionRate(targetBalanceItem.asset, this.baseCurrency);
 
       targetBalanceItem.delta = targetAmountInBaseCurrency - currentAmountInBaseCurrency;
     });

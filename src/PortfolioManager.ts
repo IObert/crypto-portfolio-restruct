@@ -53,12 +53,15 @@ export class PortfolioManager {
     this.fiatCurrency = config.fiatCurrency;
     const ignoreCoins = config.ignoreCoins || [];
 
+    if (config.test) {
+      this.prices = config.prices;
+      this.balances = config.balances || [];
+      this.initialized = true;
+    } 
+
     return new Promise(async (resolve) => {
 
-      if (config.test) {
-        this.prices = config.prices;
-        this.balances = config.balances || [];
-      } else {
+      if (!config.test) {
         if (!config.binanceKey || !config.binanceSecret) {
           throw new Error("Missing credentials");
         }

@@ -43,7 +43,7 @@ async function perform() {
     name: "EOS",
     ratio: 0.081
   }, {
-    asset: "LDBNB",
+    asset: "BNB",
     name: "Binance",
     ratio: 0.093
   }, {

@@ -1,4 +1,4 @@
-import binanceApiNode, { Binance, AssetBalance } from "binance-api-node";
+import binanceApiNode, { Binance, AssetBalance, Symbol } from "binance-api-node";
 import SymbolMapper from "./SymbolMapper";
 
 interface Order {
@@ -74,8 +74,13 @@ export class PortfolioManager {
         this.symbols = exInfo.symbols;
       }
 
+      const assets = new Set<string>();
+      this.symbols.forEach((symbol: Symbol) => {
+        assets.add(symbol.baseAsset);
+        assets.add(symbol.quoteAsset);
+      });
       this.balances = this.balances.filter((oBalanceItem: any) => {
-        oBalanceItem.asset = SymbolMapper(oBalanceItem.asset);
+        oBalanceItem.asset = SymbolMapper(oBalanceItem.asset, assets);
         return !ignoreCoins.includes(oBalanceItem.asset);
       });
 

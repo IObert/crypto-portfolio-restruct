@@ -23,7 +23,6 @@ interface Configuration {
   binanceKey?: string;
   binanceSecret?: string;
   baseCurrency?: string;
-  fiatCurrency?: string;
   prices?: any;
   graph?: any;
   balances?: AssetBalance[];
@@ -34,7 +33,6 @@ interface RatioAsset {
   asset: string;
   string: string;
   base: number;
-  fiat?: number;
   ratio: number;
 }
 
@@ -46,7 +44,6 @@ export class PortfolioManager {
   symbols: import("binance-api-node").Symbol[] = [];
   baseCurrency: string = "USDT";
   graph: any;
-  fiatCurrency?: string;
   targetBalances: TargetAsset[] = [];
 
   // TODO write readme
@@ -55,7 +52,6 @@ export class PortfolioManager {
   async init(config: Configuration): Promise<any> {
 
     this.baseCurrency = config.baseCurrency || this.baseCurrency;
-    this.fiatCurrency = config.fiatCurrency;
 
     if (config.test) {
       this.prices = config.prices;
@@ -204,24 +200,16 @@ export class PortfolioManager {
       const amount = +balanceItem.free;
       if (amount !== 0) {
         const base = amount * this.getVirtualConvertionRate(balanceItem.asset, this.baseCurrency);
-        let fiat;
-        if (this.fiatCurrency) {
-          fiat = base * this.getVirtualConvertionRate(this.baseCurrency, this.fiatCurrency);
-        }
         const ratio = base / sumOfCurrentAssets * 100;
         const currentItem = aRatioBalances.find((o: any) => o.asset === balanceItem.asset);
 
         if (currentItem) {
           currentItem.base += base;
-          if (currentItem.fiat && fiat) {
-            currentItem.fiat += fiat;
-          }
           currentItem.ratio += base;
           currentItem.string = `${currentItem.asset}: ${currentItem.ratio.toFixed(precision)}%`;
         } else {
           aRatioBalances.push({
             base,
-            fiat,
             ratio,
             asset: balanceItem.asset,
             string: `${balanceItem.asset}: ${ratio.toFixed(precision)}%`
@@ -232,12 +220,8 @@ export class PortfolioManager {
 
     aRatioBalances.sort((a, b) => b.ratio - a.ratio);
 
-    if (this.fiatCurrency) {
-      sumOfCurrentAssets = sumOfCurrentAssets * this.getVirtualConvertionRate(this.baseCurrency, this.fiatCurrency);
-    }
-
     return {
-      sum: { asset: this.fiatCurrency || this.baseCurrency, amount: sumOfCurrentAssets },
+      sum: { asset: this.baseCurrency, amount: sumOfCurrentAssets },
       portfolio: aRatioBalances
     };
   }

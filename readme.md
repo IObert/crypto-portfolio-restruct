@@ -52,16 +52,14 @@ Before the portfolio manager can be used, you need to initialize it.
 await myManager.init({
     binanceSecret: process.env.BINANCE_SECRET,
     binanceKey: process.env.BINANCE_KEY,
-    baseCurrency: "BNB",
-    fiatCurrency: "EUR",
+    baseCurrency: "EUR"
 });
 ```
 
 Parameters:
 - binanceSecret: The Binance [API key](https://www.binance.com/en/support/faq/360002502072-How-to-create-API) secret
 - binanceKey: The Binance [API key](https://www.binance.com/en/support/faq/360002502072-How-to-create-API)
-- baseCurrency: The portfolio manager will calculate the portfolio sum in this token. It also tries to convert all other currencies in this token before it will be traded into the target currency.
-- ? fiatCurrency: Will only be used to display the portfolio value in the summary
+- baseCurrency: The portfolio manager will calculate the portfolio sum in this asset.
 
 > For testing purposes, you can add `test: true` to the config and pass in `prices` and `balances` as well.
 

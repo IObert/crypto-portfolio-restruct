@@ -27,7 +27,6 @@ interface Configuration {
   prices?: any;
   graph?: any;
   balances?: AssetBalance[];
-  ignoreCoins?: string[];
   test?: boolean;
 }
 
@@ -57,7 +56,6 @@ export class PortfolioManager {
 
     this.baseCurrency = config.baseCurrency || this.baseCurrency;
     this.fiatCurrency = config.fiatCurrency;
-    const ignoreCoins = config.ignoreCoins || [];
 
     if (config.test) {
       this.prices = config.prices;
@@ -104,9 +102,8 @@ export class PortfolioManager {
             this.graph[symbol.quoteAsset][symbol.baseAsset] = 1;
           }
         });
-        this.balances = this.balances.filter((oBalanceItem: any) => {
+        this.balances.forEach((oBalanceItem: any) => {
           oBalanceItem.asset = SymbolMapper(oBalanceItem.asset, assets);
-          return !ignoreCoins.includes(oBalanceItem.asset);
         });
 
         this.initialized = true;

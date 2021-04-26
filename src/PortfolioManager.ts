@@ -51,11 +51,28 @@ export class PortfolioManager {
 
   async init(config: Configuration): Promise<any> {
 
+
+    this.graph = {};
     this.baseCurrency = config.baseCurrency || this.baseCurrency;
 
     if (config.test) {
-      this.prices = config.prices;
-      this.graph = config.graph;
+      this.prices = {};
+      Object.keys(config.prices).forEach((pair: string) => {
+        const splitted = pair.split(",");
+        this.prices[splitted.join("")] = config.prices[pair];
+
+        //build up graph
+        if (!this.graph[splitted[0]]) {
+          this.graph[splitted[0]] = {};
+        }
+        this.graph[splitted[0]][splitted[1]] = 1;
+
+
+        if (!this.graph[splitted[1]]) {
+          this.graph[splitted[1]] = {};
+        }
+        this.graph[splitted[1]][splitted[0]] = 1;
+      });
       this.balances = config.balances || [];
       this.initialized = true;
     }
@@ -76,7 +93,6 @@ export class PortfolioManager {
         this.prices = await this.client.prices();
         this.balances = accountInfo.balances;
         this.symbols = exInfo.symbols;
-        this.graph = {};
 
         const assets = new Set<string>();
         this.symbols.forEach((symbol: Symbol) => {

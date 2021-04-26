@@ -16,11 +16,11 @@ describe("Portfolio Manager with unit prices", () => {
     myManager.init({
       test: true,
       prices: {
-        BNBUSDT: 1,
-        BTCUSDT: 1,
-        ETHUSDT: 1,
-        TRXUSDT: 1,
-        XRMUSDT: 1
+        "BNB,USDT": 1,
+        "BTC,USDT": 1,
+        "ETH,USDT": 1,
+        "TRX,USDT": 1,
+        "XRM,USDT": 1
       },
       balances: [{
         asset: "BTC",
@@ -107,11 +107,11 @@ describe("Portfolio Manager with unit prices", () => {
     myManager.init({
       test: true,
       prices: {
-        BNBUSDT: 1,
-        BTCUSDT: 1,
-        ETHUSDT: 1,
-        TRXUSDT: 1,
-        XRMUSDT: 1
+        "BNB,USDT": 1,
+        "BTC,USDT": 1,
+        "ETH,USDT": 1,
+        "TRX,USDT": 1,
+        "XRM,USDT": 1
       },
       balances: [{
         asset: "BTC",
@@ -195,9 +195,9 @@ describe("Portfolio Manager with simplified prices", () => {
     const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
-        BTCUSDT: 6000,
-        ETHUSDT: 130,
-        XRMUSDT: 40
+        "BTC,USDT": 6000,
+        "ETH,USDT": 130,
+        "XRM,USDT": 40
       },
       balances: [{
         asset: "BTC",
@@ -253,9 +253,9 @@ describe("Portfolio Manager with simplified prices", () => {
     const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
-        BTCUSDT: 6000,
-        USDTETH: 0.0076923077,
-        USDTXRM: 0.025
+        "BTC,USDT": 6000,
+        "USDT,ETH": 0.0076923077,
+        "USDT,XRM": 0.025
       },
       balances: [{
         asset: "BTC",
@@ -311,9 +311,9 @@ describe("Portfolio Manager with simplified prices", () => {
     const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
-        USDTBTC: 0.0001666666,
-        ETHUSDT: 130,
-        XRMUSDT: 40
+        "USDT,BTC": 0.0001666666,
+        "ETH,USDT": 130,
+        "XRM,USDT": 40
       },
       balances: [{
         asset: "BTC",
@@ -370,9 +370,9 @@ describe("Portfolio Manager with simplified prices", () => {
     const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
-        BTCUSDT: 6000,
-        USDTETH: 0.0076923077,
-        USDTXRM: 0.025
+        "BTC,USDT": 6000,
+        "USDT,ETH": 0.0076923077,
+        "USDT,XRM": 0.025
       },
       balances: [{
         asset: "BTC",
@@ -420,18 +420,18 @@ describe("Portfolio Manager with realistic prices", () => {
     const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
-        STEEMUSDT: "0.176360", // till here fakes
-        STEEMBTC: "0.00002395", // use this one when using alt base coins
-        BNBUSDT: "11.88240000",
-        XRPUSDT: "0.17236000",
-        BTCUSDT: "6121.51000000",
-        ETHUSDT: "126.66000000",
-        XMRUSDT: "46.83000000",
-        EOSUSDT: "2.12130000",
-        LTCUSDT: "37.81000000",
-        XTZUSDT: "1.53500000",
-        BCHUSDT: "206.53000000",
-        XLMUSDT: "0.03920000"
+        "STEEM,USDT": "0.176360", // till here fakes
+        "STEEM,BTC": "0.00002395", // use this one when using alt base coins
+        "BNB,USDT": "11.88240000",
+        "XRP,USDT": "0.17236000",
+        "BTC,USDT": "6121.51000000",
+        "ETH,USDT": "126.66000000",
+        "XMR,USDT": "46.83000000",
+        "EOS,USDT": "2.12130000",
+        "LTC,USDT": "37.81000000",
+        "XTZ,USDT": "1.53500000",
+        "BCH,USDT": "206.53000000",
+        "XLM,USDT": "0.03920000"
       },
       balances: [{
         asset: "BTC",
@@ -535,17 +535,17 @@ describe("Portfolio Manager with realistic prices", () => {
     const myManager = new PortfolioManager(); myManager.init({
       test: true,
       prices: {
-        STEEMUSDT: "0.176360",
-        BNBUSDT: "11.88240000",
-        XRPUSDT: "0.17236000",
-        BTCUSDT: "6121.51000000",
-        ETHUSDT: "126.66000000",
-        XMRUSDT: "46.83000000",
-        EOSUSDT: "2.12130000",
-        LTCUSDT: "37.81000000",
-        XTZUSDT: "1.53500000",
-        BCHUSDT: "206.53000000",
-        XLMUSDT: "0.03920000"
+        "STEEM,USDT": "0.176360",
+        "BNB,USDT": "11.88240000",
+        "XRP,USDT": "0.17236000",
+        "BTC,USDT": "6121.51000000",
+        "ETH,USDT": "126.66000000",
+        "XMR,USDT": "46.83000000",
+        "EOS,USDT": "2.12130000",
+        "LTC,USDT": "37.81000000",
+        "XTZ,USDT": "1.53500000",
+        "BCH,USDT": "206.53000000",
+        "XLM,USDT": "0.03920000"
       },
       balances: [{
         asset: "BTC",
@@ -706,16 +706,16 @@ describe("Portfolio Manager with realistic prices", () => {
       test: true,
       baseCurrency: "BNB",
       prices: {
-        STEEMBNB: "0.01185000",
-        XRPBNB: "0.01450000",
-        BNBBTC: "0.00193670",
-        BNBETH: "0.09227800",
-        XMRBNB: "3.89600000",
-        EOSBNB: "0.18270000",
-        LTCBNB: "3.23400000",
-        XTZBNB: "0.13117000",
-        BCHBNB: "17.82600000",
-        XLMBNB: "0.00333300"
+        "STEEM,BNB": "0.01185000",
+        "XRP,BNB": "0.01450000",
+        "BNB,BTC": "0.00193670",
+        "BNB,ETH": "0.09227800",
+        "XMR,BNB": "3.89600000",
+        "EOS,BNB": "0.18270000",
+        "LTC,BNB": "3.23400000",
+        "XTZ,BNB": "0.13117000",
+        "BCH,BNB": "17.82600000",
+        "XLM,BNB": "0.00333300"
       },
       balances: [{
         asset: "BTC",

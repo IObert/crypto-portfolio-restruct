@@ -115,6 +115,7 @@ myManager.testOrders()
 ## Known Issues
 
 - Sometimes the `sendOrders` method needs to be called multiple times (needs to be fixed)
+- Trades are only possible via the "baseCurrency". Need to implement feature to make this more efficient and resilient against missing trading pairs.
 - Currently only works with Binance exchange
 - A lot of room for improvement :)
 

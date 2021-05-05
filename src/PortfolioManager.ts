@@ -1,4 +1,6 @@
-import binanceApiNode, { Binance, AssetBalance, Symbol } from "binance-api-node";
+import binanceApiNode, { Binance, Symbol } from "binance-api-node";
+//@ts-ignore
+import KrakenClient from "kraken-api";
 import { assert } from "chai";
 //@ts-ignore
 import { single_source_shortest_paths } from "dijkstrajs";
@@ -19,14 +21,21 @@ interface TargetAsset {
   delta?: number;
 }
 
+interface AssetBalance {
+  asset: string;
+  free: string;
+}
+
 interface Configuration {
-  binanceKey?: string;
-  binanceSecret?: string;
-  baseCurrency?: string;
+  baseCurrency: string;
   prices?: any;
   graph?: any;
   balances?: AssetBalance[];
   test?: boolean;
+  krakenKey?: string;
+  krakenSecret?: string;
+  binanceKey?: string;
+  binanceSecret?: string;
 }
 
 interface RatioAsset {
@@ -37,11 +46,11 @@ interface RatioAsset {
 }
 
 export class PortfolioManager {
-  client?: Binance;
+  client?: any;
   prices: any;
   initialized: boolean = false;
   balances: AssetBalance[] = [];
-  symbols: import("binance-api-node").Symbol[] = [];
+  tradingPairs: any[] = [];
   baseCurrency: string = "USDT";
   graph: any;
   targetBalances: TargetAsset[] = [];
@@ -50,7 +59,6 @@ export class PortfolioManager {
   // TODO idea, floor to cent value to avoid rounding errors
 
   async init(config: Configuration): Promise<any> {
-
 
     this.graph = {};
     this.baseCurrency = config.baseCurrency || this.baseCurrency;
@@ -80,45 +88,103 @@ export class PortfolioManager {
     return new Promise(async (resolve) => {
 
       if (!config.test) {
-        if (!config.binanceKey || !config.binanceSecret) {
+        if (config.binanceKey && config.binanceSecret) {
+          this.client = binanceApiNode({
+            apiKey: config.binanceKey,
+            apiSecret: config.binanceSecret
+          });
+          const accountInfo = await this.client.accountInfo();
+          const exInfo = await this.client.exchangeInfo();
+          this.prices = await this.client.prices();
+          this.balances = accountInfo.balances;
+          this.tradingPairs = exInfo.symbols;
+
+          const assets = new Set<string>();
+          this.tradingPairs.forEach((pair: Symbol) => {
+
+            const base = pair.baseAsset;
+            const quote = pair.quoteAsset;
+            //build up assets
+
+            assets.add(base);
+            assets.add(quote);
+
+            if (pair.status === "TRADING") {
+              //build up graph
+              if (!this.graph[base]) {
+                this.graph[base] = {};
+              }
+              this.graph[base][quote] = 1;
+
+
+              if (!this.graph[quote]) {
+                this.graph[quote] = {};
+              }
+              this.graph[quote][base] = 1;
+            }
+          });
+          this.balances.forEach((oBalanceItem: any) => {
+            oBalanceItem.asset = SymbolMapper(oBalanceItem.asset, assets, /LD(.*)/);
+          });
+
+        } else if (config.krakenKey && config.krakenSecret) {
+          this.baseCurrency = `Z${this.baseCurrency}`;
+          this.client = new KrakenClient(config.krakenKey, config.krakenSecret);
+          const pairs = await this.client.api('AssetPairs');
+          this.tradingPairs = pairs.result; //TODO wrong type assignment
+
+
+          const assets = new Set<string>();
+          Object.values(this.tradingPairs).forEach((symbol: any) => {
+
+            const base = symbol.base;
+            const quote = symbol.quote;
+
+            //build up assets
+            assets.add(base);
+            assets.add(quote);
+
+            //build up graph
+            if (!this.graph[base]) {
+              this.graph[base] = {};
+            }
+            this.graph[base][quote] = 1;
+
+
+            if (!this.graph[quote]) {
+              this.graph[quote] = {};
+            }
+            this.graph[quote][base] = 1;
+          });
+
+          const prices = await this.client.api('Ticker', { pair: Object.keys(this.tradingPairs).join(",") })
+          this.prices = {};
+          Object.keys(prices.result).forEach((pair: string) => {
+            const fullPair = pairs.result[pair];
+            this.prices[pair] = prices.result[pair].o;
+            this.prices[`${fullPair.base}${fullPair.quote}`] = prices.result[pair].o;
+          })
+
+
+          const balances = await this.client.api('Balance');
+          this.balances = Object.keys(balances.result)
+            .filter((asset: string) => asset !== "BSV")
+            .map((asset: string) => {
+              let convertedAsset = asset === "ZEUR" ? "EUR" :
+                asset === "ZUSD" ? "USD" : SymbolMapper(asset, assets, /(.*)\.S/);
+              return {
+                asset: convertedAsset,
+                free: balances.result[asset]
+              }
+            })
+        } else {
           throw new Error("Missing credentials");
         }
-        this.client = binanceApiNode({
-          apiKey: config.binanceKey,
-          apiSecret: config.binanceSecret
-        });
-
-        const accountInfo = await this.client.accountInfo();
-        const exInfo = await this.client.exchangeInfo();
-        this.prices = await this.client.prices();
-        this.balances = accountInfo.balances;
-        this.symbols = exInfo.symbols;
-
-        const assets = new Set<string>();
-        this.symbols.forEach((symbol: Symbol) => {
-          //build up assets
-          assets.add(symbol.baseAsset);
-          assets.add(symbol.quoteAsset);
-
-          if (symbol.status === "TRADING") {
-            //build up graph
-            if (!this.graph[symbol.baseAsset]) {
-              this.graph[symbol.baseAsset] = {};
-            }
-            this.graph[symbol.baseAsset][symbol.quoteAsset] = 1;
 
 
-            if (!this.graph[symbol.quoteAsset]) {
-              this.graph[symbol.quoteAsset] = {};
-            }
-            this.graph[symbol.quoteAsset][symbol.baseAsset] = 1;
-          }
-        });
-        this.balances.forEach((oBalanceItem: any) => {
-          oBalanceItem.asset = SymbolMapper(oBalanceItem.asset, assets);
-        });
 
         this.initialized = true;
+
       }
       resolve({});
     });
@@ -187,7 +253,7 @@ export class PortfolioManager {
     if (!this.client) { // TODO add test data for rounding, remove this when ready
       return amount;
     }
-    const oInfo = this.symbols.find(oS => oS.symbol === symbol);
+    const oInfo = this.tradingPairs.find(oS => oS.symbol === symbol);
     if (!oInfo || oInfo.status !== "TRADING") {
       throw new Error(`Inactive trading pair: ${symbol}`);
     }

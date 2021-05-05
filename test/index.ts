@@ -6,8 +6,10 @@ config();
 async function perform() {
   const myManager = new PortfolioManager();
   await myManager.init({
-    binanceSecret: process.env.BINANCE_SECRET,
-    binanceKey: process.env.BINANCE_KEY,
+    krakenKey: process.env.KRAKEN_KEY,
+    krakenSecret: process.env.KRAKEN_SECRET,
+    // binanceKey: process.env.BINANCE_KEY,
+    // binanceSecret: process.env.BINANCE_SECRET,
     baseCurrency: "EUR"
   });
 

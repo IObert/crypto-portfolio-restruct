@@ -30,6 +30,7 @@
     "binance-api-node": "^0.10.13",
     "dijkstrajs": "^1.0.1",
     "dotenv": "^8.2.0",
+    "kraken-api": "^1.0.1",
     "tsc": "^1.20150623.0",
     "tslint-config-airbnb": "^5.11.2"
   },

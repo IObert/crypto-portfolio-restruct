@@ -25,23 +25,18 @@ describe("Portfolio Manager with unit prices", () => {
       balances: [{
         asset: "BTC",
         free: "5",
-        locked: "0"
       }, {
         asset: "BNB",
         free: "0",
-        locked: "0"
       }, {
         asset: "ETH",
         free: "0",
-        locked: "0"
       }, {
         asset: "TRX",
         free: "0",
-        locked: "0"
       }, {
         asset: "XRM",
         free: "0",
-        locked: "0"
       }]
     });
 
@@ -116,23 +111,23 @@ describe("Portfolio Manager with unit prices", () => {
       balances: [{
         asset: "BTC",
         free: "4",
-        locked: "0"
+
       }, {
         asset: "BNB",
         free: "1",
-        locked: "0"
+
       }, {
         asset: "ETH",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "TRX",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XRM",
         free: "0",
-        locked: "0"
+
       }]
     });
 
@@ -202,15 +197,140 @@ describe("Portfolio Manager with simplified prices", () => {
       balances: [{
         asset: "BTC",
         free: "2",
-        locked: "0"
+
       }, {
         asset: "ETH",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XRM",
         free: "0",
-        locked: "0"
+
+      }]
+    });
+
+    myManager.setGoalState([{
+      asset: "BTC",
+      name: "BitCoin",
+      ratio: 0.5
+    }, {
+      asset: "ETH",
+      name: "Ethereum",
+      ratio: 0.25
+    }, {
+      asset: "XRM",
+      name: "Monero",
+      ratio: 0.25
+    }]);
+
+    assert.sameDeepMembers(myManager.getOrders(), [{
+      symbol: "BTCUSDT",
+      side: "SELL",
+      quantity: 1,
+      type: "MARKET"
+    }, {
+      symbol: "ETHUSDT",
+      side: "BUY",
+      quantity: 23.076923076923077,
+      type: "MARKET"
+    }, {
+      symbol: "XRMUSDT",
+      side: "BUY",
+      quantity: 75,
+      type: "MARKET"
+    }]);
+  });
+
+  it("should compute orders with one indirect trade (1st degree)", () => {
+    // asumptions:
+    // no need to differentiate between sell and buy orders
+    // trading via USDT
+    // start state= one holding
+
+    const myManager = new PortfolioManager();
+    myManager.init({
+      test: true,
+      prices: {
+        "BTC,BUSD": 6000,
+        "BUSD,USDT": 1,
+        "ETH,USDT": 130,
+        "XRM,USDT": 40
+      },
+      balances: [{
+        asset: "BTC",
+        free: "2",
+
+      }, {
+        asset: "ETH",
+        free: "0",
+
+      }, {
+        asset: "XRM",
+        free: "0",
+
+      }]
+    });
+
+    myManager.setGoalState([{
+      asset: "BTC",
+      name: "BitCoin",
+      ratio: 0.5
+    }, {
+      asset: "ETH",
+      name: "Ethereum",
+      ratio: 0.25
+    }, {
+      asset: "XRM",
+      name: "Monero",
+      ratio: 0.25
+    }]);
+
+    assert.sameDeepMembers(myManager.getOrders(), [{
+      symbol: "BTCUSDT",
+      side: "SELL",
+      quantity: 1,
+      type: "MARKET"
+    }, {
+      symbol: "ETHUSDT",
+      side: "BUY",
+      quantity: 23.076923076923077,
+      type: "MARKET"
+    }, {
+      symbol: "XRMUSDT",
+      side: "BUY",
+      quantity: 75,
+      type: "MARKET"
+    }]);
+  });
+
+
+  it("should compute orders with one indirect trade (2nd degree)", () => {
+    // asumptions:
+    // no need to differentiate between sell and buy orders
+    // trading via USDT
+    // start state= one holding
+
+    const myManager = new PortfolioManager(); myManager.init({
+      test: true,
+      prices: {
+        "BTC,BUSD": 6000,
+        "BUSD,CUSD": 0.5,
+        "CUSD,USDT": 2,
+        "ETH,USDT": 130,
+        "XRM,USDT": 40
+      },
+      balances: [{
+        asset: "BTC",
+        free: "2",
+
+      }, {
+        asset: "ETH",
+        free: "0",
+
+      }, {
+        asset: "XRM",
+        free: "0",
+
       }]
     });
 
@@ -260,15 +380,15 @@ describe("Portfolio Manager with simplified prices", () => {
       balances: [{
         asset: "BTC",
         free: "2",
-        locked: "0"
+
       }, {
         asset: "ETH",
         free: "50",
-        locked: "0"
+
       }, {
         asset: "XRM",
         free: "0",
-        locked: "0"
+
       }]
     });
 
@@ -318,15 +438,15 @@ describe("Portfolio Manager with simplified prices", () => {
       balances: [{
         asset: "BTC",
         free: "2",
-        locked: "0"
+
       }, {
         asset: "ETH",
         free: "50",
-        locked: "0"
+
       }, {
         asset: "XRM",
         free: "0",
-        locked: "0"
+
       }]
     });
 
@@ -377,15 +497,15 @@ describe("Portfolio Manager with simplified prices", () => {
       balances: [{
         asset: "BTC",
         free: "2",
-        locked: "0"
+
       }, {
         asset: "ETH",
         free: "50",
-        locked: "0"
+
       }, {
         asset: "XRM",
         free: "0",
-        locked: "0"
+
       }]
     });
 
@@ -436,51 +556,51 @@ describe("Portfolio Manager with realistic prices", () => {
       balances: [{
         asset: "BTC",
         free: "1",
-        locked: "0"
+
       }, {
         asset: "STEEM",
         free: "4589.53",
-        locked: "0"
+
       }, {
         asset: "BNB",
         free: "248",
-        locked: "0"
+
       }, {
         asset: "ETH",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XRP",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "EOS",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "LTC",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "BNB",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XTZ",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "BCH",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XMR",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XLM",
         free: "0",
-        locked: "0"
+
       }]
     });
 
@@ -550,51 +670,51 @@ describe("Portfolio Manager with realistic prices", () => {
       balances: [{
         asset: "BTC",
         free: "1",
-        locked: "0"
+
       }, {
         asset: "STEEM",
         free: "4589.53",
-        locked: "0"
+
       }, {
         asset: "BNB",
         free: "248",
-        locked: "0"
+
       }, {
         asset: "ETH",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XRP",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "EOS",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "LTC",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "BNB",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XTZ",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "BCH",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XMR",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XLM",
         free: "0",
-        locked: "0"
+
       }]
     });
 
@@ -720,51 +840,51 @@ describe("Portfolio Manager with realistic prices", () => {
       balances: [{
         asset: "BTC",
         free: "1",
-        locked: "0"
+
       }, {
         asset: "STEEM",
         free: "4589.53",
-        locked: "0"
+
       }, {
         asset: "BNB",
         free: "248",
-        locked: "0"
+
       }, {
         asset: "ETH",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XRP",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "EOS",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "LTC",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "BNB",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XTZ",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "BCH",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XMR",
         free: "0",
-        locked: "0"
+
       }, {
         asset: "XLM",
         free: "0",
-        locked: "0"
+
       }]
     });
 

@@ -114,6 +114,7 @@ myManager.testOrders()
 
 ## Known Issues
 
+- Temporarily removed the trading feature
 - Sometimes the `sendOrders` method needs to be called multiple times (needs to be fixed)
 - Trades are only possible via the "baseCurrency". 
 - Cannot send orders to Kraken exchange

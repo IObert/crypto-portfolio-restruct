@@ -27,7 +27,7 @@ interface AssetBalance {
 }
 
 interface Configuration {
-  baseCurrency: string;
+  baseCurrency?: string;
   prices?: any;
   graph?: any;
   balances?: AssetBalance[];
@@ -250,27 +250,28 @@ export class PortfolioManager {
   }
 
   private roundAmount(symbol: string, amount: number): number {
-    if (!this.client) { // TODO add test data for rounding, remove this when ready
-      return amount;
-    }
-    const oInfo = this.tradingPairs.find(oS => oS.symbol === symbol);
-    if (!oInfo || oInfo.status !== "TRADING") {
-      throw new Error(`Inactive trading pair: ${symbol}`);
-    }
+    return amount;
+    // if (!this.client) { // TODO add test data for rounding, remove this when ready
+    //   return amount;
+    // }
+    // const oInfo = this.tradingPairs.find(oS => oS.symbol === symbol);
+    // if (!oInfo || oInfo.status !== "TRADING") {
+    //   throw new Error(`Inactive trading pair: ${symbol}`);
+    // }
 
-    // @ts-ignore
-    const lotFilter = oInfo.filters.find((oFilter: any) => oFilter.filterType === "LOT_SIZE");
-    // @ts-ignore
-    const log10 = Math.log10(+lotFilter.stepSize);
+    // // @ts-ignore
+    // const lotFilter = oInfo.filters.find((oFilter: any) => oFilter.filterType === "LOT_SIZE");
+    // // @ts-ignore
+    // const log10 = Math.log10(+lotFilter.stepSize);
 
-    // @ts-ignore
-    const minFilter = oInfo.filters.find((oFilter: any) => oFilter.filterType === "MIN_NOTIONAL");
-    // @ts-ignore
-    const min = +minFilter.minNotional;
+    // // @ts-ignore
+    // const minFilter = oInfo.filters.find((oFilter: any) => oFilter.filterType === "MIN_NOTIONAL");
+    // // @ts-ignore
+    // const min = +minFilter.minNotional;
 
-    const candidate = +amount.toFixed(-log10);
-    // return candidate;
-    return candidate > min ? candidate : 0;
+    // const candidate = +amount.toFixed(-log10);
+    // // return candidate;
+    // return candidate > min ? candidate : 0;
   }
 
   getPortfolio(precision: number = 2): any {
@@ -318,6 +319,89 @@ export class PortfolioManager {
     }, 0);
   }
 
+  private getOrder(targetBalanceItem: any, exchangeAsset: string): Order {
+    const buyPair = `${targetBalanceItem.asset}${exchangeAsset}`;
+    const buyConvertionRate = this.prices[buyPair];
+    const sellPair = `${exchangeAsset}${targetBalanceItem.asset}`;
+    const sellConvertionRate = this.prices[sellPair];
+
+    if (buyConvertionRate) {
+      if (targetBalanceItem.amount > 0) {
+        return {
+          symbol: buyPair,
+          side: "BUY",
+          type: "MARKET",
+          quantity: this.roundAmount(buyPair, targetBalanceItem.amount)
+        };
+      }
+      if (targetBalanceItem.amount < 0) {
+        return {
+          symbol: buyPair,
+          side: "SELL",
+          type: "MARKET",
+          quantity: this.roundAmount(buyPair, -targetBalanceItem.amount / buyConvertionRate)
+        };
+      }
+    }
+    if (sellConvertionRate) {
+      if (targetBalanceItem.amount > 0) {
+        return {
+          symbol: sellPair,
+          side: "SELL",
+          type: "MARKET",
+          quantity: this.roundAmount(sellPair, targetBalanceItem.amount / buyConvertionRate)
+        };
+      }
+      if (targetBalanceItem.amount < 0) {
+        return {
+          symbol: sellPair,
+          side: "BUY",
+          type: "MARKET",
+          quantity: this.roundAmount(sellPair, -targetBalanceItem.amount)
+        };
+      }
+    }
+    throw new Error(`Cannot find matching trading pair for ${buyPair} / ${sellPair}.`);
+  }
+
+  private getVirtualOrders(targetBalanceItem: TargetAsset): Order[] {
+    const path = single_source_shortest_paths(this.graph, this.baseCurrency, targetBalanceItem.asset);
+    const virtualRate = this.getVirtualConvertionRate(targetBalanceItem.asset, this.baseCurrency);
+    let convertibleAmount = targetBalanceItem.delta;
+    let convertibleAsset = targetBalanceItem.asset;
+
+    if (convertibleAmount === undefined) {
+      throw new Error(`Delta has not been calculated: ${targetBalanceItem}`);
+    }
+
+    let virtualOrders: Order[] = [];
+    let intermedAsset = convertibleAsset;
+    let thereIsAnotherOrderNeeded: boolean;
+    do {
+      // asset2 = intermed;
+      intermedAsset = path[intermedAsset];
+      thereIsAnotherOrderNeeded = intermedAsset !== this.baseCurrency;
+      if (thereIsAnotherOrderNeeded) {
+        debugger
+        const factor = this.getConvertionRate(convertibleAsset, intermedAsset);
+        virtualOrders = [...virtualOrders, this.getOrder({
+          asset: convertibleAsset,
+          amount: convertibleAmount / virtualRate * factor
+        }, intermedAsset)];
+        convertibleAsset = intermedAsset;
+
+      } else {
+        virtualOrders = [...virtualOrders, this.getOrder({
+          asset: convertibleAsset,
+          amount: convertibleAmount
+        }, intermedAsset)];
+      }
+
+    } while (thereIsAnotherOrderNeeded);
+
+    return virtualOrders;
+  }
+
   getOrders(): Order[] {
     if (!this.initialized) {
       throw new Error("Instance was never initialized.");
@@ -342,56 +426,9 @@ export class PortfolioManager {
       (targetBalanceItem.delta !== 0) &&
       (targetBalanceItem.asset !== this.baseCurrency));
 
-    const orders = this.targetBalances.map((targetBalanceItem: TargetAsset) => {
-
-      const buyPair = `${targetBalanceItem.asset}${this.baseCurrency}`;
-      const buyConvertionRate = this.prices[buyPair];
-      const sellPair = `${this.baseCurrency}${targetBalanceItem.asset}`;
-      const sellConvertionRate = this.prices[sellPair];
-
-      if (targetBalanceItem.delta === undefined) {
-        throw new Error(`Delta has not been calculated: ${targetBalanceItem}`);
-      }
-
-      if (buyConvertionRate) {
-        if (targetBalanceItem.delta > 0) {
-          return {
-            symbol: buyPair,
-            side: "BUY",
-            type: "MARKET",
-            quantity: this.roundAmount(buyPair, targetBalanceItem.delta / buyConvertionRate)
-          };
-        }
-        if (targetBalanceItem.delta < 0) {
-          return {
-            symbol: buyPair,
-            side: "SELL",
-            type: "MARKET",
-            quantity: this.roundAmount(buyPair, -targetBalanceItem.delta / buyConvertionRate)
-          };
-        }
-      }
-      if (sellConvertionRate) {
-        if (targetBalanceItem.delta > 0) {
-          return {
-            symbol: sellPair,
-            side: "SELL",
-            type: "MARKET",
-            quantity: this.roundAmount(sellPair, targetBalanceItem.delta)
-          };
-        }
-        if (targetBalanceItem.delta < 0) {
-          return {
-            symbol: sellPair,
-            side: "BUY",
-            type: "MARKET",
-            quantity: this.roundAmount(sellPair, -targetBalanceItem.delta)
-          };
-        }
-      }
-      throw new Error(`Cannot find matching trading pair for ${buyPair} / ${sellPair}.`);
-    });
-    return orders;
+    const orders = this.targetBalances.map((targetBalanceItem: TargetAsset) => this.getVirtualOrders(targetBalanceItem));
+    //@ts-ignore
+    return orders.flat();
     // return orders.filter((o) => {
     //   if (o.quantity < 1) {
     //     return false;

@@ -1,7 +1,6 @@
 import binanceApiNode, { Binance, Symbol } from "binance-api-node";
 //@ts-ignore
-import KrakenClient from "kraken-api";
-import { assert } from "chai";
+import KrakenClient from "./Kraken";
 //@ts-ignore
 import { single_source_shortest_paths } from "dijkstrajs";
 
@@ -382,7 +381,6 @@ export class PortfolioManager {
       intermedAsset = path[intermedAsset];
       thereIsAnotherOrderNeeded = intermedAsset !== this.baseCurrency;
       if (thereIsAnotherOrderNeeded) {
-        debugger
         const factor = this.getConvertionRate(convertibleAsset, intermedAsset);
         virtualOrders = [...virtualOrders, this.getOrder({
           asset: convertibleAsset,

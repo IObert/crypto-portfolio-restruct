@@ -37,6 +37,11 @@ interface Configuration {
   binanceSecret?: string;
 }
 
+interface PublicConfiguration {
+  baseCurrency: string;
+  client: string;
+}
+
 interface RatioAsset {
   asset: string;
   string: string;
@@ -47,19 +52,16 @@ interface RatioAsset {
 export class PortfolioManager {
   client?: any;
   prices: any;
-  initialized: boolean = false;
+  userInitialized: boolean = false;
   balances: AssetBalance[] = [];
+  assets: Set<string> = new Set<string>();
   tradingPairs: any[] = [];
   baseCurrency: string = "USDT";
-  graph: any;
+  graph: any = {};
   targetBalances: TargetAsset[] = [];
 
-  // TODO write readme
-  // TODO idea, floor to cent value to avoid rounding errors
 
   async init(config: Configuration): Promise<any> {
-
-    this.graph = {};
     this.baseCurrency = config.baseCurrency || this.baseCurrency;
 
     if (config.test) {
@@ -81,7 +83,7 @@ export class PortfolioManager {
         this.graph[splitted[1]][splitted[0]] = 1;
       });
       this.balances = config.balances || [];
-      this.initialized = true;
+      this.userInitialized = true;
     }
 
     return new Promise(async (resolve) => {
@@ -92,38 +94,14 @@ export class PortfolioManager {
             apiKey: config.binanceKey,
             apiSecret: config.binanceSecret
           });
+          await this.initBinanceClient();
+
           const accountInfo = await this.client.accountInfo();
-          const exInfo = await this.client.exchangeInfo();
-          this.prices = await this.client.prices();
           this.balances = accountInfo.balances;
-          this.tradingPairs = exInfo.symbols;
 
-          const assets = new Set<string>();
-          this.tradingPairs.forEach((pair: Symbol) => {
-
-            const base = pair.baseAsset;
-            const quote = pair.quoteAsset;
-            //build up assets
-
-            assets.add(base);
-            assets.add(quote);
-
-            if (pair.status === "TRADING") {
-              //build up graph
-              if (!this.graph[base]) {
-                this.graph[base] = {};
-              }
-              this.graph[base][quote] = 1;
-
-
-              if (!this.graph[quote]) {
-                this.graph[quote] = {};
-              }
-              this.graph[quote][base] = 1;
-            }
-          });
+          // Sync flex savings assets
           this.balances.forEach((oBalanceItem: any) => {
-            oBalanceItem.asset = SymbolMapper(oBalanceItem.asset, assets, /LD(.*)/);
+            oBalanceItem.asset = SymbolMapper(oBalanceItem.asset, this.assets, /LD(.*)/);
           });
 
         } else if (config.krakenKey && config.krakenSecret) {
@@ -133,15 +111,14 @@ export class PortfolioManager {
           this.tradingPairs = pairs.result; //TODO wrong type assignment
 
 
-          const assets = new Set<string>();
           Object.values(this.tradingPairs).forEach((symbol: any) => {
 
             const base = symbol.base;
             const quote = symbol.quote;
 
             //build up assets
-            assets.add(base);
-            assets.add(quote);
+            this.assets.add(base);
+            this.assets.add(quote);
 
             //build up graph
             if (!this.graph[base]) {
@@ -170,7 +147,7 @@ export class PortfolioManager {
             .filter((asset: string) => asset !== "BSV")
             .map((asset: string) => {
               let convertedAsset = asset === "ZEUR" ? "EUR" :
-                asset === "ZUSD" ? "USD" : SymbolMapper(asset, assets, /(.*)\.S/);
+                asset === "ZUSD" ? "USD" : SymbolMapper(asset, this.assets, /(.*)\.S/);
               return {
                 asset: convertedAsset,
                 free: balances.result[asset]
@@ -180,18 +157,56 @@ export class PortfolioManager {
           throw new Error("Missing credentials");
         }
 
-
-
-        this.initialized = true;
+        this.userInitialized = true;
 
       }
       resolve({});
     });
   }
 
+  private async initBinanceClient() {
+    const exInfo = await this.client.exchangeInfo();
+    this.prices = await this.client.prices();
+    this.tradingPairs = exInfo.symbols;
+
+    this.tradingPairs.forEach((pair: Symbol) => {
+
+      const base = pair.baseAsset;
+      const quote = pair.quoteAsset;
+
+      //build up assets
+      this.assets.add(base);
+      this.assets.add(quote);
+
+      if (pair.status === "TRADING") {
+        //build up graph
+        if (!this.graph[base]) {
+          this.graph[base] = {};
+        }
+        this.graph[base][quote] = 1;
+
+
+        if (!this.graph[quote]) {
+          this.graph[quote] = {};
+        }
+        this.graph[quote][base] = 1;
+      }
+    });
+  }
+
+  async initPublicClient(config: PublicConfiguration) {
+    this.baseCurrency = config.baseCurrency || this.baseCurrency;
+    if (config.client === "binance") {
+      this.client = binanceApiNode();
+      await this.initBinanceClient();
+    } else {
+      throw new Error("Only support Binance as of now");
+    }
+  }
+
   setGoalState(assets: TargetAsset[]) {
-    if (!this.initialized) {
-      throw new Error("Instance was never initialized.");
+    if (!this.userInitialized) {
+      throw new Error("Instance was never userInitialized.");
     }
     this.targetBalances = assets;
     const targetAssets = assets.map(asset => asset.asset);
@@ -274,11 +289,18 @@ export class PortfolioManager {
   }
 
   getPortfolio(precision: number = 2): any {
-    let sumOfCurrentAssets = this.getPortfolioValue();
+    if (!this.userInitialized) {
+      throw new Error("Instance was never userInitialized.");
+    }
+    return this.calcPortfolio(this.balances)
+  }
+
+  calcPortfolio(balances: AssetBalance[], precision: number = 2): any {
+    let sumOfCurrentAssets = this.calcPortfolioValue(balances);
 
     const aRatioBalances: RatioAsset[] = [];
 
-    this.balances.forEach((balanceItem: AssetBalance) => {
+    balances.forEach((balanceItem: AssetBalance) => {
       const amount = +balanceItem.free;
       if (amount !== 0) {
         const base = amount * this.getVirtualConvertionRate(balanceItem.asset, this.baseCurrency);
@@ -308,8 +330,8 @@ export class PortfolioManager {
     };
   }
 
-  getPortfolioValue(): number {
-    return this.balances.reduce((sum: number, balanceItem: AssetBalance) => {
+  calcPortfolioValue(balances: AssetBalance[]): number {
+    return balances.reduce((sum: number, balanceItem: AssetBalance) => {
       const amount = +balanceItem.free;
       if (amount === 0) {
         return sum;
@@ -319,6 +341,9 @@ export class PortfolioManager {
   }
 
   private getOrder(targetBalanceItem: any, exchangeAsset: string): Order {
+    if (!this.userInitialized) {
+      throw new Error("Instance was never userInitialized.");
+    }
     const buyPair = `${targetBalanceItem.asset}${exchangeAsset}`;
     const buyConvertionRate = this.prices[buyPair];
     const sellPair = `${exchangeAsset}${targetBalanceItem.asset}`;
@@ -401,10 +426,10 @@ export class PortfolioManager {
   }
 
   getOrders(): Order[] {
-    if (!this.initialized) {
-      throw new Error("Instance was never initialized.");
+    if (!this.userInitialized) {
+      throw new Error("Instance was never userInitialized.");
     }
-    const sumOfCurrentAssets = this.getPortfolioValue();
+    const sumOfCurrentAssets = this.calcPortfolioValue(this.balances);
 
     this.targetBalances.forEach((targetBalanceItem) => {
 
@@ -437,8 +462,8 @@ export class PortfolioManager {
   }
 
   async sendOrders() {
-    if (!this.initialized || !this.client) {
-      throw new Error("Instance was never initialized.");
+    if (!this.userInitialized || !this.client) {
+      throw new Error("Instance was never userInitialized.");
     }
 
     // @ts-ignore
@@ -446,8 +471,8 @@ export class PortfolioManager {
   }
 
   async testOrders() {
-    if (!this.initialized || !this.client) {
-      throw new Error("Instance was never initialized.");
+    if (!this.userInitialized || !this.client) {
+      throw new Error("Instance was never userInitialized.");
     }
 
     // @ts-ignore

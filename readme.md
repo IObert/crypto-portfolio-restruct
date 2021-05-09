@@ -43,10 +43,11 @@ First, you need to create an instance of the `PortfolioManager`.
 const myManager = new PortfolioManager();
 ```
 
+### Methods to access data from accounts 
 
-### `init`
+#### `init`
 
-Before the portfolio manager can be used, you need to initialize it.
+Enter the account key before the portfolio manager can access personal APIs.
 
 ```
 await myManager.init({
@@ -56,14 +57,35 @@ await myManager.init({
 });
 ```
 
+or 
+
+```
+await myManager.init({
+    krakenKey: process.env.BINANCE_SECRET,
+    krakenSecret: process.env.BINANCE_KEY,
+    baseCurrency: "EUR"
+});
+```
+
 Parameters:
-- binanceSecret: The Binance [API key](https://www.binance.com/en/support/faq/360002502072-How-to-create-API) secret
 - binanceKey: The Binance [API key](https://www.binance.com/en/support/faq/360002502072-How-to-create-API)
+- binanceSecret: The Binance [API secret](https://www.binance.com/en/support/faq/360002502072-How-to-create-API) 
+- krakenKey: The Binance [API key](https://support.kraken.com/hc/en-us/articles/360000919966-How-to-generate-an-API-key-pair-)
+- krakenSecret: The Binance [API secret](https://support.kraken.com/hc/en-us/articles/360000919966-How-to-generate-an-API-key-pair-)
 - baseCurrency: The portfolio manager will calculate the portfolio sum in this asset.
 
 > For testing purposes, you can add `test: true` to the config and pass in `prices` and `balances` as well.
 
-### `setGoalState`
+#### `getPortfolio`
+
+Use this function to calculate the value of the user' portfolio:
+
+```
+myManager.getPortfolio()
+```
+
+
+#### `setGoalState`
 
 Set the desired distribution of the assets in your portfolio.
 
@@ -85,7 +107,7 @@ Parameters:
 - ? name: Name of the curreny
 
 
-### `getOrders`
+#### `getOrders`
 
 > Need to set the goal state first.
 Will return the orders that are required to restructure the portfolio.
@@ -94,7 +116,7 @@ Will return the orders that are required to restructure the portfolio.
 myManager.getOrders()
 ```
 
-### `sendOrders`
+#### `sendOrders`
 
 Same as `getOrders` but actually sends to orders to the Binance API interface.
 
@@ -102,12 +124,57 @@ Same as `getOrders` but actually sends to orders to the Binance API interface.
 myManager.sendOrders()
 ```
 
-### `testOrders`
+#### `testOrders`
 
 Same as `sendOrders` but it will only send the orders to the **DEMO endpoint** of the Binance API interface. This can be used to test if the trade parameters are valid.
 
 ```
 myManager.testOrders()
+```
+
+
+
+### Methods to access data from accounts 
+
+#### `initPublicClient`
+
+Use this init function if you only want to access public data
+
+```
+  await myManager.initPublicClient({
+    client: "binance",
+    baseCurrency: "EUR"
+  });
+```
+
+Parameters:
+- client: Currently only "binance" is supported 
+- baseCurrency: The portfolio manager will calculate the portfolio sum in this asset.
+
+#### `calcPortfolio`
+
+Use this function to calculate the value of a given portfolio
+
+```
+myManager.calcPortfolio([{
+    asset: "ETH",
+    free: "1"
+  }, {
+    asset: "BTC",
+    free: "0.07"
+  }, {
+    asset: "LTC",
+    free: "10"
+  }, {
+    asset: "BNB",
+    free: "6"
+  }, {
+    asset: "XMR",
+    free: "7"
+  }, {
+    asset: "DASH",
+    free: "9"
+  }])
 ```
 
 

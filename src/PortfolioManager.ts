@@ -110,6 +110,12 @@ export class PortfolioManager {
           const pairs = await this.client.api('AssetPairs');
           this.tradingPairs = pairs.result; //TODO wrong type assignment
 
+          this.graph["EUR"] = {
+            "ZEUR": 1
+          };
+          this.graph["USD"] = {
+            "ZUSD": 1
+          };
 
           Object.values(this.tradingPairs).forEach((symbol: any) => {
 
@@ -134,12 +140,16 @@ export class PortfolioManager {
           });
 
           const prices = await this.client.api('Ticker', { pair: Object.keys(this.tradingPairs).join(",") })
-          this.prices = {};
+          this.prices = {
+            "ZEUREUR": 1,
+            "ZUSDUSD": 1
+          };
           Object.keys(prices.result).forEach((pair: string) => {
             const fullPair = pairs.result[pair];
             this.prices[pair] = prices.result[pair].o;
             this.prices[`${fullPair.base}${fullPair.quote}`] = prices.result[pair].o;
           })
+
 
 
           const balances = await this.client.api('Balance');

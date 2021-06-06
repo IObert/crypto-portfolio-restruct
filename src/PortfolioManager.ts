@@ -97,7 +97,7 @@ export class PortfolioManager {
           await this.initBinanceClient();
 
           const accountInfo = await this.client.accountInfo();
-          this.balances = accountInfo.balances;
+          this.balances = accountInfo.balances; // maybe need this line .filter((o: any) => o.asset !== "ATA")
 
           // Sync flex savings assets
           this.balances.forEach((oBalanceItem: any) => {
@@ -319,7 +319,7 @@ export class PortfolioManager {
 
         if (currentItem) {
           currentItem.base += base;
-          currentItem.ratio += base;
+          currentItem.ratio += base / sumOfCurrentAssets * 100;
           currentItem.string = `${currentItem.asset}: ${currentItem.ratio.toFixed(precision)}%`;
         } else {
           aRatioBalances.push({

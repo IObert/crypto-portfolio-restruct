@@ -116,6 +116,11 @@ export class PortfolioManager {
           this.graph["USD"] = {
             "ZUSD": 1
           };
+          this.graph["ETH2"] = {
+            "XETH": 1
+          };
+
+          this.assets.add("ETH2");
 
           Object.values(this.tradingPairs).forEach((symbol: any) => {
 
@@ -142,7 +147,8 @@ export class PortfolioManager {
           const prices = await this.client.api('Ticker', { pair: Object.keys(this.tradingPairs).join(",") })
           this.prices = {
             "ZEUREUR": 1,
-            "ZUSDUSD": 1
+            "ZUSDUSD": 1,
+            "ETH2XETH": 1
           };
           Object.keys(prices.result).forEach((pair: string) => {
             const fullPair = pairs.result[pair];

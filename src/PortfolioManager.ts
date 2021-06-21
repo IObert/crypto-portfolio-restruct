@@ -35,6 +35,7 @@ interface Configuration {
   krakenSecret?: string;
   binanceKey?: string;
   binanceSecret?: string;
+  ignoreCoins?: string[]
 }
 
 interface PublicConfiguration {
@@ -59,10 +60,12 @@ export class PortfolioManager {
   baseCurrency: string = "USDT";
   graph: any = {};
   targetBalances: TargetAsset[] = [];
+  ignoreCoins: string[] = [];
 
 
   async init(config: Configuration): Promise<any> {
     this.baseCurrency = config.baseCurrency || this.baseCurrency;
+    this.ignoreCoins = config.ignoreCoins || this.ignoreCoins;
 
     if (config.test) {
       this.prices = {};
@@ -97,7 +100,7 @@ export class PortfolioManager {
           await this.initBinanceClient();
 
           const accountInfo = await this.client.accountInfo();
-          this.balances = accountInfo.balances; // maybe need this line .filter((o: any) => o.asset !== "ATA")
+          this.balances = accountInfo.balances.filter((o: any) => !this.ignoreCoins.includes(o.asset)) // TODO ignore this coin for now, may remove later
 
           // Sync flex savings assets
           this.balances.forEach((oBalanceItem: any) => {
